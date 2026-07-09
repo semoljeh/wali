@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Wali Santri - Madrasah Darussalam</title>
+    
+    <!-- ========================================== -->
+    <!-- META TAG UNTUK SHARE WHATSAPP & SOSMED -->
+    <!-- ========================================== -->
+    <meta name="description" content="Portal resmi Wali Santri Madrasah Darussalam. Pantau nilai akademik, absensi, dan riwayat administrasi SPP putra/putri Anda secara mandiri.">
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Portal Wali Santri - Madrasah Darussalam">
+    <meta property="og:description" content="Pantau nilai akademik, absensi, dan riwayat administrasi SPP putra/putri Anda secara mandiri dari HP.">
+    <!-- Link gambar SUDAH DIPERBAIKI menggunakan domain asli -->
+    <meta property="og:image" content="https://guru.madasa.ponpes.id/asset/logowaliweb.png">
+    <meta property="og:image:secure_url" content="https://guru.madasa.ponpes.id/asset/logowaliweb.png">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portal Wali Santri - Madrasah Darussalam">
+    <meta name="twitter:description" content="Pantau nilai akademik, absensi, dan riwayat administrasi SPP putra/putri Anda secara mandiri dari HP.">
+    <!-- Link gambar SUDAH DIPERBAIKI menggunakan domain asli -->
+    <meta name="twitter:image" content="https://guru.madasa.ponpes.id/asset/logowaliweb.png">
+    <!-- ========================================== -->
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../asset/logoweb.png">
+    <link rel="shortcut icon" href="../asset/logoweb.png" type="image/png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+   <link rel="stylesheet" href="style.css?v=4">
+   
+<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#065f46">
+    <link rel="apple-touch-icon" href="../asset/logo.png">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<div id="pwaInstallPromptOrtu" class="fixed top-4 right-4 z-[100] w-[calc(100%-2rem)] sm:w-80 bg-white/90 backdrop-blur-xl border border-emerald-100 shadow-2xl rounded-2xl p-4 transition-all duration-700 transform translate-x-[150%] opacity-0 flex items-start gap-4">
+        <button onclick="tutupNotifPWAOrtu()" class="absolute top-2 right-2 w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all cursor-pointer">
+            <i class="fas fa-times text-sm"></i>
+        </button>
+        
+        <div class="w-12 h-12 shrink-0 bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+        
+        <div class="flex-1 pt-0.5">
+            <h4 class="font-heading font-bold text-gray-800 text-sm mb-1">Install Portal Ortu</h4>
+            <p class="text-[11px] text-gray-500 leading-relaxed mb-3">Pasang aplikasi ini di layar HP Anda untuk memantau nilai & SPP anak dengan cepat.</p>
+            <button onclick="installPWAOrtu()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all transform hover:-translate-y-0.5">
+                Install Sekarang
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm hidden">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-emerald-600"></div>
+    </div>
+
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md p-4 sm:px-8 flex items-center justify-between gap-4">
+        <div>
+            <h1 class="font-heading font-bold text-base sm:text-lg leading-tight">MADRASAH DARUSSALAM</h1>
+            <p class="text-[11px] text-emerald-200 font-medium">Portal Informasi & Perkembangan Belajar Santri</p>
+        </div>
+        <img src="../asset/logo.png" class="w-12 h-12 object-contain drop-shadow-md shrink-0" alt="Logo Madrasah" onerror="this.style.display='none'">
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+        
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+                    <i class="fas fa-user-shield text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-base sm:text-lg">Akses Informasi Santri</h3>
+                    <p class="text-xs text-gray-500">Masukkan nomor induk dan tanggal lahir anak untuk memvalidasi data.</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">NIS (Nomor Induk Santri)</label>
+                    <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Lahir Santri</label>
+                    <input type="date" id="ortuTglLahir" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all font-medium text-gray-700">
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="tarikDataDariDatabase()" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-search"></i> Cek Perkembangan Santri
+                </button>
+            </div>
+        </div>
+		
+		
+		<!-- PANEL QUOTES WALI SANTRI -->
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-5 rounded-2xl border border-emerald-100 shadow-sm mt-6 flex items-start gap-4">
+            <div class="p-3 bg-emerald-600 text-white rounded-xl shadow-inner shrink-0">
+                <!-- Ukuran ikon dibesarkan sedikit menyesuaikan teks -->
+                <i class="fas fa-lightbulb text-2xl"></i> 
+            </div>
+            <div class="flex-1">
+                <!-- text-sm diubah menjadi text-base, margin bawah (mb-1) ditambah menjadi mb-2 -->
+                <h4 class="font-bold text-emerald-800 text-base mb-2">Mutiara Hikmah Darussalam</h4>
+                
+                <!-- text-xs diubah menjadi text-sm (untuk HP) dan md:text-base (untuk layar lebih besar) -->
+                <p id="kutipanTeks" class="text-sm md:text-base text-emerald-700 italic leading-relaxed transition-opacity duration-500 opacity-0">
+                    Memuat kutipan...
+                </p>
+            </div>
+        </div>
+        <!-- END PANEL QUOTES -->
+
+        <div id="hasilDataOrtu" class="hidden space-y-6">
+            
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-5 sm:p-6 rounded-2xl text-white shadow-md relative overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-5 sm:p-6 rounded-2xl text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-[10px] font-bold tracking-widest text-emerald-200 uppercase mb-1">PROFIL SANTRI</p>
+                    <h4 id="ortuNamaSantri" class="text-xl sm:text-2xl font-bold mb-1">-</h4>
+                    <p class="text-xs opacity-90">NIS: <span id="ortuNisSantri" class="font-mono font-bold">-</span> | Kelas: <span id="ortuKelasSantri" class="font-bold">-</span></p>
+                    
+                    <!-- TAMBAHAN DATA JENIS KELAMIN, ORANG TUA & ALAMAT -->
+                    <div class="mt-3 pt-3 border-t border-emerald-400/50 text-[11px] opacity-90 space-y-1">
+                        <p><i class="fas fa-venus-mars w-4 text-center text-emerald-200"></i> Jenis Kelamin: <span id="ortuJkSantri" class="font-semibold">-</span></p>
+                        <p><i class="fas fa-user-friends w-4 text-center text-emerald-200"></i> Orang Tua: <span id="ortuNamaOrtu" class="font-semibold">-</span></p>
+                        <p><i class="fas fa-map-marker-alt w-4 text-center text-emerald-200"></i> Alamat: <span id="ortuAlamatSantri" class="font-semibold">-</span></p>
+                    </div>
+                </div>
+                <i class="fas fa-user-graduate absolute -right-4 -bottom-4 text-emerald-900/20 text-7xl sm:text-8xl"></i>
+            </div>
+                <i class="fas fa-user-graduate absolute -right-4 -bottom-4 text-emerald-900/20 text-7xl sm:text-8xl"></i>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                    <h5 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
+                        <i class="fas fa-calendar-check text-emerald-500"></i> Rekap Absensi Semester Berjalan
+                    </h5>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-blue-50 p-3 rounded-xl">
+                            <span class="block text-[11px] text-blue-600 font-medium">Sakit</span>
+                            <span id="ortuSakit" class="text-lg font-bold text-blue-700">0</span>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-xl">
+                            <span class="block text-[11px] text-amber-600 font-medium">Izin</span>
+                            <span id="ortuIzin" class="text-lg font-bold text-amber-700">0</span>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded-xl">
+                            <span class="block text-[11px] text-red-600 font-medium">Alpa</span>
+                            <span id="ortuAlpa" class="text-lg font-bold text-red-700">0</span>
+                        </div>
+                    </div>
+                </div>
+
+              <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex flex-col h-full">
+                    <h5 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2 shrink-0">
+                        <i class="fas fa-wallet text-teal-500"></i> Riwayat Administrasi / SPP
+                    </h5>
+                    <div id="wadahSppOrtu" class="flex-1 overflow-y-auto pr-2 space-y-2 max-h-32">
+                        <div class="text-center text-xs text-gray-400 py-4">
+                            <i class="fas fa-spinner fa-spin mr-1"></i> Sedang memuat riwayat SPP...
+                        </div>
+                    </div>
+                </div>
+				
+            </div>
+			
+			<!-- ============================================== -->
+            <!-- TAMBAHAN: KEPRIBADIAN & CATATAN WALI KELAS -->
+            <!-- ============================================== -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6">
+                <h5 class="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2">
+                    <i class="fas fa-star text-orange-500"></i> Kepribadian & Catatan Wali Kelas
+                </h5>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-5">
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <span class="block text-[11px] text-blue-600 font-bold mb-1">AKHLAQ</span>
+                        <span id="ortuAkhlaq" class="text-xl font-black text-blue-700">-</span>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <span class="block text-[11px] text-blue-600 font-bold mb-1">KERAJINAN</span>
+                        <span id="ortuRajin" class="text-xl font-black text-blue-700">-</span>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <span class="block text-[11px] text-blue-600 font-bold mb-1">DISIPLIN</span>
+                        <span id="ortuDisiplin" class="text-xl font-black text-blue-700">-</span>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <span class="block text-[11px] text-blue-600 font-bold mb-1">KERAPIAN</span>
+                        <span id="ortuRapi" class="text-xl font-black text-blue-700">-</span>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-sm">
+                    <p class="text-emerald-800 font-bold mb-1"><i class="fas fa-clipboard-check mr-1"></i> Keputusan Akhir:</p>
+                    <p id="ortuKeputusan" class="text-emerald-700 mb-4 font-semibold bg-white p-2 rounded border border-emerald-200 inline-block">-</p>
+                    
+                    <p class="text-purple-800 font-bold mb-1"><i class="fas fa-comment-dots mr-1"></i> Catatan Wali Kelas:</p>
+                    <p id="ortuCatatan" class="text-purple-700 italic font-medium leading-relaxed bg-white p-3 rounded border border-purple-200 shadow-sm">"-"</p>
+                </div>
+            </div>
+            <!-- ============================================== -->
+            
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                <h5 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
+                    <i class="fas fa-graduation-cap text-emerald-500"></i> Nilai Hasil Ujian Penilaian
+                </h5>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 font-bold border-b border-gray-200">
+                                <!-- Class whitespace-nowrap mencegah teks menumpuk -->
+                                <th class="p-3 whitespace-nowrap">Komponen / Mata Pelajaran</th>
+                                <th class="p-3 text-center whitespace-nowrap w-24 sm:w-28">Nilai Angka</th>
+                                <th class="p-3 text-center whitespace-nowrap w-24 sm:w-36">Kategori</th>
+                            </tr>
+                        </thead>
+                       <tbody id="bodyTabelNilaiOrtu" class="divide-y divide-gray-100 bg-white">
+                        </tbody>
+                        
+                        <!-- FOOTER TOTAL & RANKING KELAS -->
+                        <tfoot id="footerTabelNilaiOrtu" class="bg-gray-50 hidden">
+                            <tr class="border-t-2 border-gray-200">
+                                <!-- whitespace-nowrap ditambahkan pada setiap judul dan nilai footer -->
+                                <td class="p-3 font-bold text-gray-700 text-right uppercase text-xs whitespace-nowrap">Total Nilai</td>
+                                <td class="p-3 text-center font-black text-base text-gray-800 whitespace-nowrap" id="ortuTotalNilai">-</td>
+                                <td></td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="p-3 font-bold text-gray-700 text-right uppercase text-xs whitespace-nowrap">Rata-Rata</td>
+                                <td class="p-3 text-center font-black text-base text-blue-600 whitespace-nowrap" id="ortuRataRata">-</td>
+                                <td></td>
+                            </tr>
+                            <tr class="bg-emerald-100/50 border-t border-emerald-200">
+                                <td class="p-3 font-bold text-emerald-800 text-right uppercase text-xs align-middle whitespace-nowrap">Peringkat Kelas</td>
+                                <td class="p-3 text-center align-middle font-bold text-black uppercase text-xs tracking-wide whitespace-nowrap" colspan="2">
+                                    KE-<span id="ortuRanking">-</span> DARI <span id="ortuJumlahSantri">-</span> SANTRI
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+                    
+
+        </div>
+    </main>
+	
+	
+	<!-- ============================================== -->
+    <!-- WIDGET WHATSAPP FLOATING (MELAYANG) -->
+    <!-- ============================================== -->
+    <div id="wa-widget" class="fixed bottom-6 right-6 z-40 flex flex-col items-center cursor-grab select-none" style="touch-action: none;">
+        <a id="wa-link" href="https://wa.me/6282333166659?text=Assalamu'alaikum%20Admin,%20saya%20butuh%20bantuan%20terkait%20Portal%20Wali%20Santri." target="_blank" class="relative flex items-center justify-center w-12 h-12 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-full shadow-2xl transition-transform transform hover:scale-105 pointer-events-auto">
+            <span class="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-50 animate-ping"></span>
+            <i class="fab fa-whatsapp text-2xl relative z-10"></i>
+        </a>
+    </div>
+
+   <script src="../config.js?v=4"></script>
+<script src="script.js?v=4"></script>
+</body>
+</html>

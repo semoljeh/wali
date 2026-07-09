@@ -1,0 +1,51 @@
+/* =========================================================
+   STYLE KHUSUS PORTAL WALI SANTRI DARUSSALAM
+   ========================================================= */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Background Islami Khas Darussalam */
+.islamic-bg {
+    background-color: #065f46;
+    background-image: radial-gradient(#059669 2.5px, transparent 2.5px), radial-gradient(#059669 2.5px, transparent 2.5px);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+
+/* Efek Kaca untuk Panel Transparan */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+}
+
+/* Kustomisasi Scrollbar Browser */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #059669;
+}
+
+/* Animasi Halus Transisi */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
