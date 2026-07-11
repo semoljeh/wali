@@ -1,5 +1,40 @@
 // Pastikan URL ini persis sama dengan GAS_URL yang ada di file script.js Anda!
 
+
+
+// =========================================================
+// WELCOME SCREEN (SAPAAN WALI SANTRI)
+// =========================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const sudahPernahBuka = localStorage.getItem('sudahDisapaOrtu');
+    const panelWelcome = document.getElementById('welcomeOrtu');
+    
+    if (panelWelcome) {
+        if (!sudahPernahBuka) {
+            // Jika belum pernah buka, tampilkan layar sambutan
+            panelWelcome.classList.remove('hidden');
+        } else {
+            // Jika sudah pernah, sembunyikan secara permanen
+            panelWelcome.classList.add('hidden');
+        }
+    }
+});
+
+function tutupWelcomeOrtu() {
+    const panelWelcome = document.getElementById('welcomeOrtu');
+    if (panelWelcome) {
+        // Simpan memori di browser HP orang tua agar besok tidak muncul lagi
+        localStorage.setItem('sudahDisapaOrtu', 'true');
+        
+        // Animasi memudar
+        panelWelcome.classList.add('opacity-0');
+        
+        setTimeout(() => {
+            panelWelcome.classList.add('hidden');
+        }, 700); // Sesuaikan dengan durasi animasi duration-700
+    }
+}
+
 let JADWAL_MAPEL = {};
 
 function showLoading(show) {
