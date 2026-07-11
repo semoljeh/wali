@@ -23,22 +23,7 @@ function tutupWelcomeOrtu() {
         
         setTimeout(() => {
             panelWelcome.classList.add('hidden');
-        }, 700); // Sesuaikan dengan durasi animasi duration-700
-    }
-}
-
-function tutupWelcomeOrtu() {
-    const panelWelcome = document.getElementById('welcomeOrtu');
-    if (panelWelcome) {
-        // Simpan memori di browser HP orang tua agar besok tidak muncul lagi
-        localStorage.setItem('sudahDisapaOrtu', 'true');
-        
-        // Animasi memudar
-        panelWelcome.classList.add('opacity-0');
-        
-        setTimeout(() => {
-            panelWelcome.classList.add('hidden');
-        }, 700); // Sesuaikan dengan durasi animasi duration-700
+        }, 700); 
     }
 }
 
