@@ -3,22 +3,29 @@
 
 
 // =========================================================
-// WELCOME SCREEN (SAPAAN WALI SANTRI)
+// WELCOME SCREEN (SAPAAN WALI SANTRI) - TAMPIL SETIAP SAAT
 // =========================================================
 document.addEventListener("DOMContentLoaded", () => {
-    const sudahPernahBuka = localStorage.getItem('sudahDisapaOrtu');
     const panelWelcome = document.getElementById('welcomeOrtu');
     
     if (panelWelcome) {
-        if (!sudahPernahBuka) {
-            // Jika belum pernah buka, tampilkan layar sambutan
-            panelWelcome.classList.remove('hidden');
-        } else {
-            // Jika sudah pernah, sembunyikan secara permanen
-            panelWelcome.classList.add('hidden');
-        }
+        // Pastikan halaman selalu tampil saat link baru dibuka
+        panelWelcome.classList.remove('hidden');
+        panelWelcome.classList.remove('opacity-0');
     }
 });
+
+function tutupWelcomeOrtu() {
+    const panelWelcome = document.getElementById('welcomeOrtu');
+    if (panelWelcome) {
+        // Hanya jalankan animasi memudar tanpa menyimpan riwayat ke memori browser
+        panelWelcome.classList.add('opacity-0');
+        
+        setTimeout(() => {
+            panelWelcome.classList.add('hidden');
+        }, 700); // Sesuaikan dengan durasi animasi duration-700
+    }
+}
 
 function tutupWelcomeOrtu() {
     const panelWelcome = document.getElementById('welcomeOrtu');
