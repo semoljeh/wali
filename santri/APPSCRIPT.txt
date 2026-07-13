@@ -1,0 +1,85 @@
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 1. Tentukan Nama Sheet berdasarkan pilihan kelas dari Form
+  var namaSheet = data.kelas; 
+  var sheet = ss.getSheetByName(namaSheet);
+  
+  // 2. Jika Sheet dengan nama kelas tersebut belum ada, buat otomatis
+  if (!sheet) {
+    sheet = ss.insertSheet(namaSheet);
+    // Header diperbarui sesuai urutan yang diminta
+    sheet.appendRow(["WAKTU", "NAMA LENGKAP", "L/P", "TTL", "KELAS", "ALAMAT", "NAMA AYAH", "NAMA IBU", "NO HP", "LINK FOTO", "LINK KK"]);
+    sheet.getRange(1, 1, 1, 11).setFontWeight("bold").setBackground("#d1e7dd");
+  }
+  
+  // 3. Folder Drive untuk simpan gambar
+  var folder = DriveApp.getFolderById("1vB2Bv2xr5c0BWlUKG9FWT2x6MaMGZxfx"); 
+  
+  var fotoFile = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data.fotoData), "image/jpeg", "Foto_" + data.nama + "_" + data.kelas));
+  var kkFile = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data.kkData), "image/jpeg", "KK_" + data.nama + "_" + data.kelas));
+  
+  // 4. Masukkan data ke sheet sesuai urutan kolom yang baru
+  sheet.appendRow([
+    new Date(),        // Kolom A: WAKTU
+    data.nama,         // Kolom B: NAMA LENGKAP
+    data.jk,           // Kolom C: L/P
+    data.ttl,          // Kolom D: TTL
+    data.kelas,        // Kolom E: KELAS
+    data.alamat,       // Kolom F: ALAMAT
+    data.ayah,         // Kolom G: NAMA AYAH
+    data.ibu,          // Kolom H: NAMA IBU
+    data.wa,           // Kolom I: NO HP
+    fotoFile.getUrl(), // Kolom J: LINK FOTO
+    kkFile.getUrl()    // Kolom K: LINK KK
+  ]);
+  
+  return ContentService.createTextOutput("Sukses").setMimeType(ContentService.MimeType.TEXT);
+}
+
+function doGet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  var allData = [];
+
+  sheets.forEach(function(sheet) {
+    var data = sheet.getDataRange().getValues();
+    if (data.length > 1) { 
+      for (var i = 1; i < data.length; i++) {
+        var rawDate = new Date(data[i][0]);
+        
+        // Ambil link dari Kolom J (indeks 9)
+       var linkFoto = data[i][9] ? data[i][9].toString() : "";
+        var fotoViewUrl = "";
+        
+        // Ambil ID dari link Google Drive
+        var match = linkFoto.match(/[-\w]{25,}/);
+        if (match) {
+          // GUNAKAN FORMAT INI: Format Thumbnail jauh lebih kebal dari pemblokiran Google
+          fotoViewUrl = "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w500"; 
+        }
+        
+        allData.push({
+          rawDateObj: rawDate.getTime(), 
+          waktu: Utilities.formatDate(rawDate, "GMT+7", "dd/MM/yyyy HH:mm"),
+          nama: data[i][1], 
+          kelas: data[i][4],
+          foto: fotoViewUrl // Data foto dimasukkan ke sini
+        });
+      }
+    }
+  });
+
+  // Urutkan dari yang terbaru
+  allData.sort(function(a, b) {
+    return b.rawDateObj - a.rawDateObj;
+  });
+
+  allData.forEach(function(item) {
+    delete item.rawDateObj;
+  });
+
+  return ContentService.createTextOutput(JSON.stringify(allData))
+    .setMimeType(ContentService.MimeType.JSON);
+}

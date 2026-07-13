@@ -433,41 +433,86 @@ function prosesDanTampilkanData(nis, kelas, headers, rows, statusRilis, detailRa
 
     containerHasil.classList.remove('hidden');
 }
+// FORMAT RUPIAH KHUSUS PORTAL ORTU
+function formatRp(angka) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+}
+
 // ==========================================
 // FUNGSI TARIK DATA RIWAYAT SPP KHUSUS ORTU
 // ==========================================
 function muatRiwayatSpp(nisSantri) {
     const wadah = document.getElementById('wadahSppOrtu');
-    wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>';
+    const elTagihan = document.getElementById('ortuTagihanSpp');
+    const elSisa = document.getElementById('ortuSisaSpp');
     
-    const fd = new URLSearchParams();
-    fd.append('action', 'getSppSantri'); // Endpoint yang dibuat di APPSSCRIPT.txt
-    fd.append('nis', nisSantri);
+    wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>';
+    if (elTagihan) elTagihan.innerText = '-';
+    if (elSisa) elSisa.innerText = '-';
+    
+    const fdSpp = new URLSearchParams();
+    fdSpp.append('action', 'getSppSantri');
+    fdSpp.append('nis', nisSantri);
 
-    fetch(GAS_URL, { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(res => {
+    const fdSetting = new URLSearchParams();
+    fdSetting.append('action', 'getSettingSpp');
+
+    // Tarik data Riwayat Anak dan Pengaturan Harga Madrasah secara bersamaan
+    Promise.all([
+        fetch(GAS_URL, { method: 'POST', body: fdSpp }).then(r => r.json()),
+        fetch(GAS_URL, { method: 'POST', body: fdSetting }).then(r => r.json())
+    ])
+    .then(([resSpp, resSetting]) => {
         wadah.innerHTML = ''; 
         
-        if (res.status === 'success' && res.data.length > 0) {
-            res.data.forEach(item => {
-                let warnaTeks = item.status.includes('LUNAS') ? 'text-emerald-600' : 
-                                item.status.includes('BELUM') ? 'text-red-500' : 'text-amber-500';
-                let warnaBg = item.status.includes('LUNAS') ? 'bg-emerald-50' : 
-                              item.status.includes('BELUM') ? 'bg-red-50' : 'bg-amber-50';
+        // Kalkulasi Tagihan Berdasarkan Setting Master
+        let totalTagihan = 0;
+        if (resSetting && resSetting.status === 'success') {
+            let nominal = parseFloat(resSetting.nominal) || 0;
+            let bulan = parseFloat(resSetting.bulan) || 0;
+            totalTagihan = nominal * bulan;
+        }
+
+        let totalTerbayar = 0;
+
+        if (resSpp.status === 'success' && resSpp.data.length > 0) {
+            resSpp.data.forEach(item => {
+                let nom = parseFloat(item.nominal) || 0;
+                totalTerbayar += nom;
+
+                let warnaTeks = item.status === 'LUNAS' ? 'text-emerald-600' : 'text-amber-600';
+                let warnaBg = item.status === 'LUNAS' ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100';
 
                 wadah.innerHTML += `
-                    <div class="flex justify-between items-center p-2 rounded-lg border border-gray-50 text-xs ${warnaBg} mb-2">
-                        <span class="font-medium text-gray-700">${item.keterangan}</span>
-                        <span class="font-bold ${warnaTeks}">${item.status}</span>
+                    <div class="flex justify-between items-center p-2.5 rounded-lg border text-xs ${warnaBg} mb-2 shadow-sm">
+                        <div>
+                            <span class="font-bold text-gray-700 block mb-0.5">${item.keterangan}</span>
+                            <span class="font-semibold text-blue-600">${formatRp(nom)}</span>
+                        </div>
+                        <span class="font-bold px-2 py-1 bg-white rounded-md ${warnaTeks} border shadow-sm">${item.status}</span>
                     </div>
                 `;
             });
         } else {
-            wadah.innerHTML = `<div class="text-center text-xs text-gray-400 py-4">Belum ada riwayat pembayaran yang tercatat.</div>`;
+            wadah.innerHTML = `<div class="text-center text-xs text-gray-400 py-4 italic">Belum ada riwayat pembayaran yang tercatat.</div>`;
+        }
+
+        // Hitung Sisa Tunggakan (Sisa = Total Tagihan - Total Terbayar)
+        let sisaTunggakan = Math.max(0, totalTagihan - totalTerbayar);
+        
+        if (elTagihan) elTagihan.innerText = formatRp(totalTagihan);
+        if (elSisa) {
+            if (sisaTunggakan === 0) {
+                elSisa.innerHTML = '<i class="fas fa-check-circle mr-1"></i> LUNAS';
+                elSisa.className = "text-sm font-black text-emerald-600";
+            } else {
+                elSisa.innerText = formatRp(sisaTunggakan);
+                elSisa.className = "text-sm font-black text-red-500";
+            }
         }
     }).catch(e => {
         wadah.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Gagal terhubung ke database.</div>`;
+        console.error(e);
     });
 }
 

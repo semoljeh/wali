@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pendaftaran Santri MADASA</title>
+    
+    <link rel="icon" href="asset/logoweb.png" type="image/png">
+    
+    <meta content='MADASA DIGITAL - Pendaftaran Santri Baru & Registrasi Ulang' property='og:title'>
+    <meta content='Ahlan Wa Sahlan! Pendaftaran Santri Baru dan Daftar Ulang Santri Lama Madrasah Darussalam telah dibuka. Segera lengkapi data administrasi putra/putri Anda dan bergabunglah bersama kami melalui portal online MADASA DIGITAL.' property='og:description'>
+    <meta content='https://semoljeh.github.io/santri/asset/logodaftar.png' property='og:image'>
+    <meta content='website' property='og:type'>
+    
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css' rel='stylesheet'>
+    
+    <style>
+        :root {
+            --primary-color: #00897b; 
+            --bg-body: #f4f7f6;
+            --glass: rgba(255, 255, 255, 0.95);
+            --text-dark: #2d3436;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --app-width: 500px; 
+        }
+
+        body { 
+            background: #e5e9ea; /* Latar luar agak gelap agar aplikasi menonjol */
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding-bottom: 0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: var(--app-width);
+            min-height: 100vh;
+            background: #ffffff; /* Latar dalam aplikasi putih bersih */
+            position: relative;
+            display: flex;
+            flex-direction: column; /* Mengaktifkan mode flex atas-bawah */
+            box-shadow: 0 0 30px rgba(0,0,0,0.1); /* Efek bayangan aplikasi */
+        }
+        
+		header { 
+            /* Memberikan lapisan warna hijau khas Madasa yang transparan di atas gambar */
+            background: linear-gradient(rgba(0, 137, 123, 0.8), rgba(0, 137, 123, 0.8)), url('asset/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            color: white; 
+            padding: 35px 20px 15px; 
+            text-align: center; 
+            border-radius: 0 0 40px 40px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .logo-wrapper img {
+            width: 75px; 
+            height: 75px; 
+            object-fit: contain;
+            margin-bottom: 10px;
+            background: transparent;
+            filter: drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.9));
+        }
+
+        .header-title h1 { 
+            font-size: 1.8rem; 
+            margin: 0; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+        .header-title p { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; margin-bottom: 0; }
+
+        .content-area { 
+            padding: 20px; 
+            flex: 1; /* AJAIB: Ini akan mendorong footer ke ujung bawah layar */
+            display: flex;
+            flex-direction: column;
+        }
+        .post-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 15px; box-shadow: var(--shadow); }
+
+        .reveal { opacity: 0; transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal-up { transform: translateY(50px); }
+        .reveal-down { transform: translateY(-50px); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .pendaftaran-header { text-align: center; margin-top: 10px; }
+        .pendaftaran-header h2 { margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
+        .title-divider { border: 0; border-top: 2px solid #e0f2f1; margin: 0 0 20px 0; width: 100%; }
+
+        .form-section-title {
+            background: #f4f7f6; padding: 10px; border-radius: 10px; 
+            margin: 20px 0 15px; font-weight: bold; color: var(--primary-color);
+            font-size: 0.9rem; border-left: 4px solid var(--primary-color);
+        }
+        .input-group-form { margin-bottom: 15px; text-align: left; }
+        .input-group-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #555; }
+        .input-group-form input, .input-group-form select, .input-group-form textarea {
+            width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; 
+            box-sizing: border-box; font-family: inherit; background: #fff; outline: none; transition: border 0.3s;
+        }
+
+        .file-input-card { border: 1px solid #dfe6e9; border-radius: 12px; padding: 12px; background: #fff; }
+        .btn-modern-upload {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: #f8f9fa; color: #555; padding: 12px; border-radius: 10px;
+            cursor: pointer; border: 2px dashed #cbd5e0; transition: 0.3s; font-weight: 600; font-size: 0.85rem;
+        }
+        .btn-modern-upload:active { transform: scale(0.98); background: #e6fffa; }
+        .btn-modern-upload i { color: var(--primary-color); font-size: 1.1rem; }
+
+        .preview-box { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #eee; }
+        .preview-content { display: flex; align-items: center; gap: 12px; }
+        .img-preview-ui { border-radius: 8px; object-fit: cover; border: 2px solid var(--primary-color); background: #fff; }
+        .img-3x4 { width: 45px; aspect-ratio: 3 / 4; }
+        .img-kk { width: 70px; aspect-ratio: 3 / 2; }
+        .file-info-text { font-size: 0.75rem; color: #2d3436; font-weight: bold; }
+
+        .btn-submit { width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; } 
+
+        .btn-ok { background: var(--primary-color); color: white; border: none; padding: 10px 40px; border-radius: 10px; font-weight: 700; margin-top: 15px; cursor: pointer; transition: 0.3s; }
+
+        /* --- FOOTER BARU (LEBIH KECIL & STATIS) --- */
+        .site-footer {
+            margin-top: auto; 
+            padding: 15px 20px; /* Jarak atas-bawah dikurangi dari 25px menjadi 15px */
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            border-radius: 20px 20px 0 0; /* Lengkungan diperkecil agar lebih proporsional */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .site-footer p { 
+            margin: 0 0 10px 0; /* Jarak bawah teks dikurangi */
+            font-size: 0.75rem; /* Ukuran teks sedikit diperkecil */
+            opacity: 0.9; 
+            line-height: 1.4; 
+        }
+        .footer-links { 
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; 
+        }
+        .footer-btn {
+            color: white; text-decoration: none; font-size: 0.75rem; font-weight: 600;
+            background: rgba(255, 255, 255, 0.15); 
+            padding: 6px 12px; /* Ukuran tombol diperkecil */
+            border-radius: 15px; transition: 0.3s; border: none; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .footer-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 80%; max-width: 270px; padding: 25px 20px; border-radius: 25px; text-align: center; position: relative; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .input-group { position: relative; margin-bottom: 12px; text-align: left; }
+        .input-group i.main-icon { position: absolute; left: 15px; top: 13px; color: var(--primary-color); font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px 40px; border-radius: 12px; border: 1px solid #dfe6e9; outline: none; box-sizing: border-box; background: #f9f9f9; font-size: 0.85rem; }
+        .toggle-pass { position: absolute; right: 15px; top: 13px; color: #b2bec3; cursor: pointer; font-size: 0.9rem; }
+        
+        .error-notif { background: #ffebee; color: #c62828; padding: 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; margin-bottom: 15px; border: 1px solid #ffcdd2; display: none; animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+        #toastNotif { visibility: hidden; min-width: 250px; background-color: #e74c3c; color: #fff; text-align: center; border-radius: 12px; padding: 15px 20px; position: fixed; z-index: 3000; left: 50%; bottom: 20px; transform: translateX(-50%); font-size: 0.9rem; font-weight: bold; opacity: 0; transition: 0.3s; }
+        #toastNotif.show { visibility: visible; opacity: 1; bottom: 100px; }
+
+/* --- WADAH TOMBOL FILTER (Menjadi Grid 2x2) --- */
+.filter-container { 
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Membagi otomatis menjadi 2 kolom yang sama besar */
+    gap: 12px; /* Jarak yang rapi antar tombol */
+    margin-bottom: 25px; 
+    padding: 0 10px; 
+}
+
+/* --- DESAIN DASAR TOMBOL & DROPDOWN --- */
+.filter-btn { 
+    width: 100%; /* Memaksa semua tombol mengisi kolom gridnya masing-masing secara penuh */
+    box-sizing: border-box;
+    padding: 10px 12px; 
+    border-radius: 30px; 
+    border: 1.5px solid var(--primary-color); 
+    background-color: #ffffff; 
+    color: var(--primary-color); 
+    cursor: pointer; 
+    font-size: 11px; 
+    font-weight: 800; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+}
+
+/* Efek saat disentuh / digeser (Hover) */
+.filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 137, 123, 0.15);
+}
+
+/* Efek saat tombol aktif / dipilih */
+.filter-btn.active { 
+    background-color: var(--primary-color); /* Ganti dari background menjadi background-color */
+    color: white; 
+    box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4); 
+}
+
+/* --- DESAIN KHUSUS DROPDOWN (Menghapus Panah Bawaan Browser) --- */
+select.filter-btn {
+    appearance: none; 
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    /* Menambahkan ikon panah modern (SVG) buatan sendiri */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300897b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 35px; /* Memberi ruang agar teks tidak menabrak panah */
+}
+
+/* Ubah panah jadi putih saat dropdown aktif dan kunci posisinya */
+select.filter-btn.active {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-color: var(--primary-color);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+}
+        
+        .list-scroll-box { 
+            max-height: 250px; overflow-y: auto; padding: 5px; margin-top: 10px;
+            scrollbar-width: thin; scrollbar-color: var(--primary-color) #f1f1f1;
+        }
+        .list-scroll-box::-webkit-scrollbar { width: 6px; }
+        .list-scroll-box::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+        
+        .list-item-santri { 
+    background: white; padding: 12px 15px; border-radius: 15px; margin-bottom: 10px; 
+    display: flex; justify-content: space-between; align-items: center; 
+    box-shadow: var(--shadow); border-left: 5px solid var(--primary-color); 
+}
+/* Tambahkan 2 baris kode di bawah ini: */
+.santri-info-wrapper { display: flex; align-items: center; gap: 12px; }
+.santri-foto { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); background: #eee; flex-shrink: 0; }
+
+
+.santri-no {
+    background: #e0f2f1; /* Hijau pudar yang lembut */
+    color: var(--primary-color);
+    font-size: 11px;
+    font-weight: 900;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+		
+        .santri-meta { font-size: 9px; color: #999; text-align: right; }
+        .santri-nama-list { font-weight: 800; color: var(--text-dark); font-size: 13px; text-transform: uppercase; margin-bottom: 2px; }
+        .santri-kelas-tag { font-size: 10px; color: var(--primary-color); font-weight: bold; }
+		
+	
+        /* --- GAYA UNTUK PESAN PEMBUKA --- */
+        .welcome-card {
+            background: #ffffff; 
+            border-radius: 20px; 
+            padding: 30px 25px; 
+            text-align: center; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
+            border-top: 5px solid var(--primary-color);
+            
+            /* --- KODE UNTUK MEMANJANGKAN KOTAK --- */
+            flex: 1; /* Memaksa kotak memanjang ke atas dan ke bawah mengisi ruang */
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; /* Menjaga ikon, teks, dan tombol tetap di tengah secara vertikal */
+            align-items: center; /* Menjaga posisi tetap di tengah secara horizontal */
+            
+            margin-top: 10px; /* Memberikan sedikit celah mepet dari header */
+            margin-bottom: 10px; /* Memberikan sedikit celah mepet dari footer */
+        }
+        .welcome-card h2 { color: var(--primary-color); margin-top: 10px; font-weight: 800; }
+        .welcome-card p { font-size: 0.9rem; color: #555; line-height: 1.6; margin-bottom: 25px; }
+        .btn-start {
+            background: var(--primary-color); color: white; border: none; 
+            padding: 12px 30px; border-radius: 12px; font-size: 1rem; 
+            font-weight: bold; cursor: pointer; transition: 0.3s; 
+            display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4);
+        }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 137, 123, 0.6); }
+        
+        /* Menyembunyikan form secara default */
+        #formPendaftaranContainer { display: none; }
+		
+		
+		
+		
+		
+		/* --- GAYA TOMBOL WHATSAPP BISA DIGESER --- */
+        .wa-float {
+            position: fixed;
+            width: 48px; /* Diperkecil dari 60px */
+            height: 48px; /* Diperkecil dari 60px */
+            bottom: 40px;
+            right: 20px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 26px; /* Ikon diperkecil dari 35px */
+            box-shadow: 2px 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            touch-action: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .wa-float:active {
+            cursor: grabbing;
+            background-color: #1ebe57;
+            transform: scale(0.95); /* Tambahan efek mengecil sedikit saat ditekan */
+        }
+		
+		/* --- DESAIN MINIMALIS MODERN JUDUL SANTRI TERDAFTAR --- */
+.santri-terdaftar-header {
+    text-align: center;
+    margin-top: 40px;    /* Jarak lega dari atas */
+    margin-bottom: 25px; /* Jarak lega ke tombol filter */
+    width: 100%;
+}
+
+.santri-terdaftar-header h3 {
+    color: var(--primary-color);
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Garis bawah estetik ala aplikasi modern */
+.modern-line {
+    height: 1.5px; /* Dibuat lebih tipis */
+    width: 240px; /* Dibuat lebih panjang menyesuaikan lebar teks judul */
+    
+    /* Efek gradasi: Transparan di kiri -> Emas di tengah -> Transparan di kanan */
+    background: linear-gradient(to right, transparent, #d4af37, transparent); 
+    
+    margin: 0 auto;
+    border-radius: 10px;
+}
+		
+		
+    </style>
+</head>
+<body>
+    <div class='app-container'>
+        <header>
+            <div class='logo-wrapper'>
+                <img alt='Logo Sekolah' src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEii4Kx1ciwEKXojO5VYToZ_Z7URFqaAInhBUm9arorbLW4-g0fcfrHlxM_u-i_jhyKcJO5Tf8ghHNBycAI8gAvlF9Ei8LPDIZzr1gdvJKdPnEhPv-rP_LazmXVuGbaUP26XS29I_1TzlGHMOR34kbD1VXZ_zZ19lse5bekzEKK8qmGDpdUuXEXMFkILBvM/s1254/logo-Photoroom_11zon.png'/>
+            </div>
+            <div class='header-title'>
+                <h1>MADASA DIGITAL</h1>
+                <p>Portal Sistem Informasi & Administrasi</p>
+            </div>
+        </header>
+
+    <div class='content-area'>
+            
+            <!-- 1. KOTAK PESAN PEMBUKA -->
+            <div class='welcome-card reveal reveal-up active' id='welcomeSection'>
+                <i class="fa-solid fa-mosque" style="font-size: 45px; color: var(--primary-color);"></i>
+                <h2>Ahlan wa Sahlan!</h2>
+                <p>
+                    Assalamu'alaikum Wr. Wb.<br>
+                    Selamat datang di Portal MADASA DIGITAL. Diinformasikan kepada seluruh <strong>Santri Baru</strong> maupun <strong>Santri Lama</strong>, <b>wajib</b> untuk melakukan pendaftaran / herregistrasi ulang melalui portal ini guna pembaruan basis data Madrasah Darussalam.
+                </p>
+                <button class="btn-start" onclick="bukaForm()">
+                    <i class="fa-solid fa-clipboard-user"></i> KLIK DAFTAR
+                </button>
+            </div>
+
+            <!-- 2. KOTAK FORM PENDAFTARAN (Awalnya Disembunyikan) -->
+            <div id='formPendaftaranContainer'>
+                <div class='post-card reveal reveal-up active'>
+                    <div class='pendaftaran-header'>
+                        <h2>Formulir Pendaftaran</h2>
+                        <hr class='title-divider'/>
+                    </div>
+                    
+                    <form id='pendaftaranForm'>
+                        <!-- (Isi form input Nama, Kelas, Foto, dll biarkan sama seperti sebelumnya) -->
+                        <div class='form-section-title'>Identitas Santri</div>
+                        <div class='input-group-form'><label>Nama Lengkap</label><input name='nama' placeholder='Contoh: Abdullah' type='text'/></div>
+	
+	
+                    <div class='input-group-form reveal reveal-up'>
+                        <label>Jenis Kelamin</label>
+                        <select name='jk'>
+                            <option selected='selected' value=''>-- Pilih Jenis Kelamin --</option>
+                            <option value='Laki-laki'>Laki-laki</option>
+                            <option value='Perempuan'>Perempuan</option>
+                        </select>
+                    </div>
+					
+					
+                   <div class='input-group-form reveal reveal-up'>
+    <label>Tempat, Tanggal Lahir</label>
+    
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <input name='tempat_lahir' placeholder='Tempat Lahir' type='text' style="width: 100%; padding: 12px;"/>
+           
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <select name='tanggal_lahir' style="flex: 1; padding: 12px; min-width: 0;">
+                <option value=''>Tgl</option>
+                <option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option><option value='6'>6</option><option value='7'>7</option><option value='8'>8</option><option value='9'>9</option><option value='10'>10</option>
+                <option value='11'>11</option><option value='12'>12</option><option value='13'>13</option><option value='14'>14</option><option value='15'>15</option><option value='16'>16</option><option value='17'>17</option><option value='18'>18</option><option value='19'>19</option><option value='20'>20</option>
+                <option value='21'>21</option><option value='22'>22</option><option value='23'>23</option><option value='24'>24</option><option value='25'>25</option><option value='26'>26</option><option value='27'>27</option><option value='28'>28</option><option value='29'>29</option><option value='30'>30</option><option value='31'>31</option>
+            </select>
+
+            <select name='bulan_lahir' style="flex: 1.5; padding: 12px; min-width: 0;">
+                <option value=''>Bulan</option>
+                <option value='Januari'>Januari</option>
+                <option value='Februari'>Februari</option>
+                <option value='Maret'>Maret</option>
+                <option value='April'>April</option>
+                <option value='Mei'>Mei</option>
+                <option value='Juni'>Juni</option>
+                <option value='Juli'>Juli</option>
+                <option value='Agustus'>Agustus</option>
+                <option value='September'>September</option>
+                <option value='Oktober'>Oktober</option>
+                <option value='November'>November</option>
+                <option value='Desember'>Desember</option>
+            </select>
+
+            <input name='tahun_lahir' placeholder='Tahun' type='number' style="flex: 1; padding: 12px; min-width: 0;"/>
+        </div>
+        
+    </div>
+</div>
+					
+					
+                    <div class='input-group-form reveal reveal-up'><label>Alamat Domisili</label><textarea name='alamat' placeholder='Contoh: Batukessel Bandang Laok' rows='2'></textarea></div>
+                    
+                    <div class='input-group-form reveal reveal-up'>
+                        <label>Pilih Kelas</label>
+                        <select name='kelas'>
+                            <option selected='selected' value=''>-- Pilih Tingkatan Kelas --</option>
+                            <optgroup label='TINGKAT TK RA'>
+                                <option>TK RA I</option><option>TK RA II</option><option>TK RA III</option><option>TK RA IV</option><option>TK RA V</option>
+                            </optgroup>
+                            <optgroup label='TINGKAT IBTIDAIYAH'>
+                                <option>I IBTIDAIYAH</option><option>II IBTIDAIYAH</option><option>III IBTIDAIYAH</option><option>IV IBTIDAIYAH</option><option>V IBTIDAIYAH</option><option>VI IBTIDAIYAH</option>
+                            </optgroup>
+                            <optgroup label='TINGKAT TSANAWIYAH'>
+                                <option>I TSANAWIYAH</option><option>II TSANAWIYAH</option><option>III TSANAWIYAH</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class='input-group-form reveal reveal-up'>
+                        <label>Unggah Foto Santri (3x4)</label>
+                        <div class='file-input-card'>
+                            <input accept='image/*' id='fotoSantri' name='foto' style='display:none;' type='file'/>
+                            <div class='btn-modern-upload' onclick='document.getElementById("fotoSantri").click()'>
+                                <i class='fa-solid fa-camera-retro'></i> <span>Pilih Foto Santri</span>
+                            </div>
+                            <div class='preview-box' id='boxPreviewFoto'>
+                                <div class='preview-content'>
+                                    <img class='img-preview-ui img-3x4' id='previewFoto' src=''/>
+                                    <div class='file-info-text' id='nameFoto'></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='input-group-form reveal reveal-up'>
+                        <label>Unggah Gambar KK</label>
+                        <div class='file-input-card'>
+                            <input accept='image/*' id='fotoKK' name='kk' style='display:none;' type='file'/>
+                            <div class='btn-modern-upload' onclick='document.getElementById("fotoKK").click()'>
+                                <i class='fa-solid fa-file-image'></i> <span>Pilih Gambar KK</span>
+                            </div>
+                            <div class='preview-box' id='boxPreviewKK'>
+                                <div class='preview-content'>
+                                    <img class='img-preview-ui img-kk' id='previewKK' src=''/>
+                                    <div class='file-info-text' id='nameKK'></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='form-section-title reveal reveal-up'>Identitas Orang Tua</div>
+                    <div class='input-group-form reveal reveal-up'><label>Nama Ayah</label><input name='ayah' placeholder='Nama Lengkap Ayah Kandung' type='text'/></div>
+                    <div class='input-group-form reveal reveal-up'><label>Nama Ibu</label><input name='ibu' placeholder='Nama Lengkap Ibu Kandung' type='text'/></div>
+                    <div class='input-group-form reveal reveal-up'><label>Nomor WhatsApp Ortu/Wali</label><input name='wa' placeholder='081234567890' type='tel'/></div>
+                    <button class='btn-submit reveal reveal-up' id='btnKirim' type='submit'>KIRIM PENDAFTARAN</button>
+                </form>
+            </div>
+
+<div class='santri-terdaftar-header reveal reveal-up'>
+    <h3><i class="fa-solid fa-users-viewfinder"></i> SANTRI TERDAFTAR</h3>
+    <div class="modern-line"></div>
+</div>
+            
+<div class='filter-container reveal reveal-up' id='filterBar'>
+    <button class='filter-btn active' id='btnSemua' onclick='filterSemua()'>SEMUA</button>
+    
+    <select class='filter-btn' onchange='filterDropdown(this)'>
+        <option value='' disabled selected>TK RA</option>
+        <option value='TK RA I'>TK RA I</option>
+        <option value='TK RA II'>TK RA II</option>
+        <option value='TK RA III'>TK RA III</option>
+        <option value='TK RA IV'>TK RA IV</option>
+        <option value='TK RA V'>TK RA V</option>
+    </select>
+
+    <select class='filter-btn' onchange='filterDropdown(this)'>
+        <option value='' disabled selected>IBTIDAIYAH</option>
+        <option value='I IBTIDAIYAH'>I IBTIDAIYAH</option>
+        <option value='II IBTIDAIYAH'>II IBTIDAIYAH</option>
+        <option value='III IBTIDAIYAH'>III IBTIDAIYAH</option>
+        <option value='IV IBTIDAIYAH'>IV IBTIDAIYAH</option>
+        <option value='V IBTIDAIYAH'>V IBTIDAIYAH</option>
+        <option value='VI IBTIDAIYAH'>VI IBTIDAIYAH</option>
+    </select>
+
+    <select class='filter-btn' onchange='filterDropdown(this)'>
+        <option value='' disabled selected>TSANAWIYAH</option>
+        <option value='I TSANAWIYAH'>I TSANAWIYAH</option>
+        <option value='II TSANAWIYAH'>II TSANAWIYAH</option>
+        <option value='III TSANAWIYAH'>III TSANAWIYAH</option>
+    </select>
+</div>
+
+            <div class='list-scroll-box reveal reveal-up' id='listSantriTampil'>
+              <p style='text-align:center; font-size:12px; color:#888;'>Memuat data santri...</p>
+            </div>
+        </div>
+
+      </div> <!-- INI ADALAH PENUTUP DARI <div class='content-area'> -->
+
+        <!-- FOOTER YANG SUDAH DIPERBAIKI (Di luar content-area, di dalam app-container) -->
+       <footer class="site-footer">
+            <p>
+                <strong>&copy; 2026 MADRASAH DARUSSALAM</strong><br>
+                Sistem Informasi & Administrasi Pendaftaran Santri
+            </p>
+            <div class="footer-links">
+                <a class="footer-btn" href="https://www.madasa.ponpes.id/" target="_blank">
+                    <i class="fa-solid fa-globe"></i> Website Resmi
+                </a>
+            </div>
+        </footer>
+
+    </div> 
+
+    <!-- Modals -->
+    <div class='modal-overlay' id='loginModal'>
+        <div class='modal-content'>
+            <span onclick='closeAllModals()' style='position:absolute; top:15px; right:20px; cursor:pointer; font-size:24px; color:#ccc;'>&#215;</span>
+            <h3 style='color:var(--primary-color); font-weight:800; margin-top:0;'>Login Sistem</h3>
+            <form id='loginForm' onsubmit='handleLogin(event)'>
+                <div class='error-notif' id='loginError'></div>
+                <div class='input-group'><i class='fa-solid fa-user main-icon'></i><input id='username' placeholder='Username' type='text'/></div>
+                <div class='input-group'><i class='fa-solid fa-lock main-icon'></i><input id='password' placeholder='Password' type='password'/><i class='fa-solid fa-eye-slash toggle-pass' onclick='togglePass()'></i></div>
+                <button class='btn-submit' type='submit'>MASUK</button>
+            </form>
+        </div>
+    </div>
+
+    <div class='modal-overlay' id='loadingModal'><div class='modal-content'><i class='fa-solid fa-spinner fa-spin' style='font-size:50px; color:var(--primary-color); margin-bottom:15px;'></i><div style='font-weight:700; font-size:1.1rem;'>Memproses...</div><p style='font-size:0.85rem; color:#666;'>Sedang mengirim data.</p></div></div>
+
+    <div class='modal-overlay' id='successModal'><div class='modal-content'><i class='fa-solid fa-circle-check' style='font-size:50px; color:#2ecc71; margin-bottom:15px;'></i><div style='font-weight:700; font-size:1.1rem;'>Berhasil!</div><p style='font-size:0.85rem; color:#666;'>Data telah diproses.</p><button class='btn-ok' onclick='closeAllModals()'>OK</button></div></div>
+
+    <div id='toastNotif'><i class='fa-solid fa-circle-exclamation'></i><span id='toastMsg'></span></div>
+	
+			
+			<!-- TOMBOL WHATSAPP MELAYANG -->
+    <div id="wa-float" class="wa-float" title="Hubungi Admin MADASA">
+        <i class="fa-brands fa-whatsapp"></i>
+    </div>
+
+    <script type='text/javascript'>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxLPCs0O7Pbbtt4PIpJwHLjEWGH7mMq8PCUSN1Etb8Gdre7e-9YDH22mfrXEeD7cqil/exec';
+        let dataSantriGlobal = [];
+
+        let lastScrollTop = 0;
+        window.addEventListener("scroll", function() {
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+            let reveals = document.querySelectorAll(".reveal");
+            reveals.forEach((reveal) => {
+                if (st > lastScrollTop) {
+                    reveal.classList.add("reveal-up");
+                    reveal.classList.remove("reveal-down");
+                } else {
+                    reveal.classList.add("reveal-down");
+                    reveal.classList.remove("reveal-up");
+                }
+            });
+            lastScrollTop = st <= 0 ? 0 : st;
+        }, false);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                } else {
+                    entry.target.classList.remove("active");
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+        async function muatDaftarSantri() {
+          const wadah = document.getElementById('listSantriTampil');
+          try {
+            const resp = await fetch(scriptURL);
+            dataSantriGlobal = await resp.json();
+            renderList(dataSantriGlobal);
+          } catch (e) {
+            wadah.innerHTML = "<p style='text-align:center; color:red; font-size:12px;'>Gagal memuat daftar santri.</p>";
+          }
+        }
+
+function renderList(data) {
+    const wadah = document.getElementById('listSantriTampil');
+    wadah.innerHTML = '';
+    
+    if (!data || data.length === 0) {
+        wadah.innerHTML = "<p style='text-align:center; font-size:12px; color:#888;'>Belum ada santri terdaftar.</p>";
+        return;
+    }
+    
+    const dataTerbaru = data.slice().reverse();
+
+    // Tambahkan parameter "index" di dalam forEach
+    dataTerbaru.forEach((s, index) => {
+        const fotoSrc = s.foto ? s.foto : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+        
+        // Buat perhitungan nomor urut (dimulai dari 1)
+        const nomorUrut = index + 1;
+        
+        wadah.innerHTML += `
+            <div class="list-item-santri">
+                <div class="santri-info-wrapper">
+                    <!-- Elemen Nomor Urut Baru -->
+                    <div class="santri-no">${nomorUrut}</div>
+                    
+                    <img src="${fotoSrc}" class="santri-foto" alt="Foto Santri" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+                    <div>
+                        <div class="santri-nama-list">${s.nama}</div>
+                        <div class="santri-kelas-tag">${s.kelas}</div>
+                    </div>
+                </div>
+                <div class="santri-meta">${s.waktu}</div>
+            </div>
+        `;
+    });
+}
+
+function filterSemua() {
+    // 1. Aktifkan warna hijau pada tombol SEMUA
+    document.getElementById('btnSemua').classList.add('active');
+    
+    // 2. Kembalikan semua dropdown ke teks judul awalnya dan hilangkan warnanya
+    const dropdowns = document.querySelectorAll('#filterBar select');
+    dropdowns.forEach(select => {
+        select.selectedIndex = 0; // Reset ke opsi paling atas
+        select.classList.remove('active');
+    });
+
+    // 3. Tampilkan semua data santri
+    renderList(dataSantriGlobal);
+}
+
+function filterDropdown(elemen) {
+    // 1. Matikan warna hijau dari tombol SEMUA
+    document.getElementById('btnSemua').classList.remove('active');
+    
+    // 2. Reset dropdown lain agar tidak ada 2 dropdown yang aktif bersamaan
+    const dropdowns = document.querySelectorAll('#filterBar select');
+    dropdowns.forEach(select => {
+        if (select !== elemen) {
+            select.selectedIndex = 0;
+            select.classList.remove('active');
+        }
+    });
+
+    // 3. Beri warna hijau pada dropdown yang sedang dipilih
+    elemen.classList.add('active');
+
+    // 4. Saring data berdasarkan nama kelas yang spesifik
+    const kelasPilihan = elemen.value;
+    const dataDisaring = dataSantriGlobal.filter(santri => santri.kelas === kelasPilihan);
+    
+    // 5. Tampilkan hasil filternya
+    renderList(dataDisaring);
+}
+
+        function aktifkanPreview() {
+            const pairs = [
+                {input: 'fotoSantri', img: 'previewFoto', box: 'boxPreviewFoto', name: 'nameFoto'},
+                {input: 'fotoKK', img: 'previewKK', box: 'boxPreviewKK', name: 'nameKK'}
+            ];
+            pairs.forEach(pair => {
+                const el = document.getElementById(pair.input);
+                if(el) {
+                    el.addEventListener('change', function() {
+                        const file = this.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                document.getElementById(pair.img).src = e.target.result;
+                                document.getElementById(pair.box).style.display = "block";
+                                document.getElementById(pair.name).innerText = "✓ " + file.name;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            });
+        }
+        aktifkanPreview();
+
+        function openModalEffect(id) {
+            document.getElementById(id).style.display = "flex";
+            window.history.pushState({modalOpen: id}, ""); 
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+        }
+
+        window.onpopstate = function() { closeAllModals(); };
+
+        function openLogin() { 
+            document.getElementById("loginError").style.display = "none";
+            openModalEffect("loginModal"); 
+        }
+
+        function togglePass() {
+            const p = document.getElementById("password"), i = document.querySelector('.toggle-pass');
+            if (p.type === "password") { p.type = "text"; i.classList.replace("fa-eye-slash", "fa-eye"); }
+            else { p.type = "password"; i.classList.replace("fa-eye", "fa-eye-slash"); }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById("username").value.trim(), p = document.getElementById("password").value.trim();
+            const btn = document.querySelector('#loginForm .btn-submit'), error = document.getElementById("loginError");
+            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Memproses..."; btn.disabled = true;
+            setTimeout(() => {
+                if (u === "admin" && p === "madasa123") {
+                    closeAllModals(); 
+                    document.getElementById("successModal").style.display = "flex";
+                    btn.innerHTML = "MASUK"; btn.disabled = false;
+                    setTimeout(() => { window.location.href = "https://www.madasa.ponpes.id/p/dashboard-input-nilai-madasa.html"; }, 1500);
+                } else {
+                    error.innerHTML = "Akun tidak ditemukan!"; error.style.display = "block";
+                    btn.innerHTML = "MASUK"; btn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        document.getElementById('pendaftaranForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formElements = this.querySelectorAll('input, select, textarea');
+            let isValid = true; let fieldName = ''; let firstEl = null;
+
+            for (let i = 0; i < formElements.length; i++) {
+                const el = formElements[i];
+                if (el.type !== 'submit' && el.tagName !== 'BUTTON' && el.value.trim() === '') {
+                    isValid = false; firstEl = el;
+                    const label = el.previousElementSibling;
+                    fieldName = (label && label.tagName === 'LABEL') ? label.innerText : "Kolom ini";
+                    break;
+                }
+            }
+
+            if (!isValid) {
+                const toast = document.getElementById("toastNotif");
+                document.getElementById("toastMsg").innerText = 'Isi "' + fieldName + '" dulu!';
+                toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 3000);
+                firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstEl.style.border = "2px solid #e74c3c"; setTimeout(() => firstEl.style.border = "1px solid #dfe6e9", 3000);
+                return;
+            }
+
+            openModalEffect("loadingModal");
+            const fileFoto = document.getElementById('fotoSantri').files[0];
+            const fileKK = document.getElementById('fotoKK').files[0];
+            const readerFoto = new FileReader(); const readerKK = new FileReader();
+
+            readerFoto.readAsDataURL(fileFoto);
+            readerFoto.onload = function() {
+                const b64Foto = readerFoto.result.split(',')[1];
+                readerKK.readAsDataURL(fileKK);
+                readerKK.onload = function() {
+                    const b64KK = readerKK.result.split(',')[1];
+					
+                    const body = {
+                        nama: e.target.nama.value, 
+                        jk: e.target.jk.value, 
+                        // Baris ini diganti untuk menggabungkan 4 kolom menjadi satu teks utuh
+                        ttl: e.target.tempat_lahir.value + ", " + e.target.tanggal_lahir.value + " " + e.target.bulan_lahir.value + " " + e.target.tahun_lahir.value,
+                        
+                        alamat: e.target.alamat.value, 
+                        kelas: e.target.kelas.value,
+                        ayah: e.target.ayah.value, 
+                        ibu: e.target.ibu.value, 
+                        wa: e.target.wa.value,
+                        fotoData: b64Foto, 
+                        fotoName: fileFoto.name, 
+                        kkData: b64KK, 
+                        kkName: fileKK.name
+                    };
+
+                    fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(body) })
+                    .then(() => {
+                        document.getElementById('loadingModal').style.display = "none";
+                        openModalEffect("successModal");
+                        e.target.reset();
+                        document.getElementById('boxPreviewFoto').style.display = 'none';
+                        document.getElementById('boxPreviewKK').style.display = 'none';
+                        muatDaftarSantri();
+                    }).catch(err => {
+                        document.getElementById('loadingModal').style.display = "none";
+                        alert("Gagal mengirim data!");
+                    });
+                };
+            };
+        });
+
+        window.onclick = function(e) { if (e.target.className == 'modal-overlay') closeAllModals(); }
+        
+        window.addEventListener('load', muatDaftarSantri);
+		
+		
+		/* --- FUNGSI BUKA FORM PENDAFTARAN --- */
+        function bukaForm() {
+            // Sembunyikan pesan pembuka
+            document.getElementById('welcomeSection').style.display = 'none';
+            // Tampilkan kotak form
+            const formContainer = document.getElementById('formPendaftaranContainer');
+            formContainer.style.display = 'block';
+            
+            // Gulir otomatis layar ke arah form
+            setTimeout(() => {
+                formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+		
+		
+		
+		
+		/* --- LOGIKA WHATSAPP DRAGGABLE & PESAN OTOMATIS --- */
+        const waBtn = document.getElementById('wa-float');
+        let isDraggingWA = false;
+        let startX, startY, initialLeft, initialTop;
+        let clickPrevent = false; // Membedakan antara geser dan klik
+
+        // Event Sentuh (Smartphone)
+        waBtn.addEventListener('touchstart', dragStartWA, {passive: false});
+        document.addEventListener('touchmove', dragWA, {passive: false});
+        document.addEventListener('touchend', dragEndWA);
+
+        // Event Mouse (Komputer/Laptop)
+        waBtn.addEventListener('mousedown', dragStartWA);
+        document.addEventListener('mousemove', dragWA);
+        document.addEventListener('mouseup', dragEndWA);
+
+        function dragStartWA(e) {
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            } else {
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+            initialLeft = waBtn.offsetLeft;
+            initialTop = waBtn.offsetTop;
+            isDraggingWA = true;
+            clickPrevent = false; // Reset status klik
+        }
+
+        function dragWA(e) {
+            if (!isDraggingWA) return;
+            e.preventDefault();
+            clickPrevent = true; // Jika digeser, tandai agar tidak terbuka WhatsApp-nya
+
+            let currentX, currentY;
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+
+            let diffX = currentX - startX;
+            let diffY = currentY - startY;
+
+            // Update posisi baru
+            waBtn.style.left = (initialLeft + diffX) + 'px';
+            waBtn.style.top = (initialTop + diffY) + 'px';
+            waBtn.style.bottom = 'auto'; 
+            waBtn.style.right = 'auto'; 
+        }
+
+        function dragEndWA(e) {
+            isDraggingWA = false;
+        }
+
+        // Aksi ketika tombol diklik
+        waBtn.addEventListener('click', function(e) {
+            if (clickPrevent) {
+                // Jika tadi habis digeser, batalkan klik agar tidak tiba-tiba masuk WA
+                e.preventDefault();
+                return;
+            }
+            
+            // Konfigurasi Nomor & Pesan Sopan
+            const nomorWA = "6282333166659";
+            const pesanSopan = "Assalamu'alaikum Admin Madasa. Mohon maaf mengganggu waktunya, saya izin bertanya terkait pendaftaran santri di MADASA DIGITAL. Mohon arahannya, terima kasih.";
+            
+            // Konversi pesan agar terbaca dengan benar di URL
+            const urlWA = "https://wa.me/" + nomorWA + "?text=" + encodeURIComponent(pesanSopan);
+            
+            // Buka di tab baru (atau langsung ke aplikasi WA di HP)
+            window.open(urlWA, "_blank");
+        });
+		
+		
+
+	
+		
+    </script>
+
+</body>
+</html>
