@@ -1,0 +1,15 @@
+PORTAL WALI SANTRI - VERSI SINKRON
+
+Perubahan:
+1. GAS_URL disamakan dengan server MADASA utama terbaru.
+2. Portal tidak lagi meminta seluruh daftar santri.
+3. NIS + tanggal lahir diverifikasi langsung oleh Apps Script.
+4. Nilai memakai getNilaiSantriPublik.
+5. Pengaturan/kepribadian memakai getPengaturanSantriPublik.
+6. Riwayat SPP memakai getSppSantriPublik.
+7. Nilai yang belum berstatus Rilis tidak dikirim server.
+8. Portal tetap read-only dan tidak memakai token Admin/Guru.
+
+PENTING:
+Portal ini harus memakai deployment Apps Script terbaru yang sama dengan aplikasi MADASA utama.
+Jika URL deployment Apps Script berubah lagi, config.js aplikasi utama dan portal wali harus diperbarui ke URL yang sama.

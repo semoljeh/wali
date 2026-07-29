@@ -50,7 +50,7 @@ function tarikDataDariDatabase() {
     const ejaanTglLahir = objekTanggal.toLocaleDateString('id-ID', opsiFormat).toLowerCase();
 
     // Siapkan 2 penarik data secara bersamaan (Data Santri & Data Master Mapel)
-    const fdSantri = new URLSearchParams(); fdSantri.append('action', 'getSantri');
+    const fdSantri = new URLSearchParams(); fdSantri.append('action', 'getSantriPublik'); fdSantri.append('nis', inputNis); fdSantri.append('tanggal_lahir', ejaanTglLahir);
     const fdMapel = new URLSearchParams(); fdMapel.append('action', 'getAllMapel');
 
     Promise.all([
@@ -62,8 +62,8 @@ function tarikDataDariDatabase() {
         if (responseMapel.status === 'success') JADWAL_MAPEL = responseMapel.data;
         if (responseSantri.status !== 'success') throw new Error("Gagal mengambil master data.");
 
-        // Cari santri yang cocok
-        const santriTerpilih = responseSantri.data.find(s => s.nis.toString() === inputNis && s.ttl.toLowerCase().includes(ejaanTglLahir));
+        // Data santri sudah diverifikasi di server; server hanya mengirim santri yang cocok
+        const santriTerpilih = responseSantri.data;
 
         if (!santriTerpilih) {
             showLoading(false);
@@ -84,16 +84,18 @@ function tarikDataDariDatabase() {
         document.getElementById('ortuAlamatSantri').innerText = santriTerpilih.alamat ? santriTerpilih.alamat : '-';
 
 		// Panggil fungsi riwayat SPP
-        muatRiwayatSpp(santriTerpilih.nis);
+        muatRiwayatSpp(santriTerpilih.nis, ejaanTglLahir);
 
         // Tarik Data Nilai & Pengaturan khusus untuk kelas santri terpilih
      const fdNilai = new URLSearchParams();
-     fdNilai.append('action', 'getDataNilai');
-     fdNilai.append('kelas', santriTerpilih.kelas);
+     fdNilai.append('action', 'getNilaiSantriPublik');
+     fdNilai.append('nis', inputNis);
+     fdNilai.append('tanggal_lahir', ejaanTglLahir);
 
      const fdPengaturan = new URLSearchParams();
-     fdPengaturan.append('action', 'getPengaturan');
-     fdPengaturan.append('kelas', santriTerpilih.kelas);
+     fdPengaturan.append('action', 'getPengaturanSantriPublik');
+     fdPengaturan.append('nis', inputNis);
+     fdPengaturan.append('tanggal_lahir', ejaanTglLahir);
 
      return Promise.all([
          fetch(GAS_URL, { method: 'POST', body: fdNilai }).then(r => r.json()),
@@ -441,7 +443,7 @@ function formatRp(angka) {
 // ==========================================
 // FUNGSI TARIK DATA RIWAYAT SPP KHUSUS ORTU
 // ==========================================
-function muatRiwayatSpp(nisSantri) {
+function muatRiwayatSpp(nisSantri, tanggalLahir) {
     const wadah = document.getElementById('wadahSppOrtu');
     const elTagihan = document.getElementById('ortuTagihanSpp');
     const elSisa = document.getElementById('ortuSisaSpp');
@@ -451,8 +453,9 @@ function muatRiwayatSpp(nisSantri) {
     if (elSisa) elSisa.innerText = '-';
     
     const fdSpp = new URLSearchParams();
-    fdSpp.append('action', 'getSppSantri');
+    fdSpp.append('action', 'getSppSantriPublik');
     fdSpp.append('nis', nisSantri);
+    fdSpp.append('tanggal_lahir', tanggalLahir);
 
     const fdSetting = new URLSearchParams();
     fdSetting.append('action', 'getSettingSpp');
