@@ -44,13 +44,12 @@ function tarikDataDariDatabase() {
 
     showLoading(true);
 
-    // Konversi tanggal
     const objekTanggal = new Date(inputTgl);
     const opsiFormat = { day: 'numeric', month: 'long', year: 'numeric' };
     const ejaanTglLahir = objekTanggal.toLocaleDateString('id-ID', opsiFormat).toLowerCase();
 
-    // Siapkan 2 penarik data secara bersamaan (Data Santri & Data Master Mapel)
-    const fdSantri = new URLSearchParams(); fdSantri.append('action', 'getSantriPublik'); fdSantri.append('nis', inputNis); fdSantri.append('tanggal_lahir', ejaanTglLahir);
+    // PERBAIKAN: Gunakan pemanggilan 'getSantri' standar yang dikenali server
+    const fdSantri = new URLSearchParams(); fdSantri.append('action', 'getSantri');
     const fdMapel = new URLSearchParams(); fdMapel.append('action', 'getAllMapel');
 
     Promise.all([
@@ -58,12 +57,11 @@ function tarikDataDariDatabase() {
         fetch(GAS_URL, { method: 'POST', body: fdMapel }).then(r => r.json())
     ])
     .then(([responseSantri, responseMapel]) => {
-        // Simpan data master mapel ke memori
         if (responseMapel.status === 'success') JADWAL_MAPEL = responseMapel.data;
         if (responseSantri.status !== 'success') throw new Error("Gagal mengambil master data.");
 
-        // Data santri sudah diverifikasi di server; server hanya mengirim santri yang cocok
-        const santriTerpilih = responseSantri.data;
+        // PERBAIKAN: Pencocokan NIS dan Tanggal Lahir dilakukan di sistem web
+        const santriTerpilih = responseSantri.data.find(s => s.nis.toString() === inputNis && s.ttl.toLowerCase().includes(ejaanTglLahir));
 
         if (!santriTerpilih) {
             showLoading(false);
@@ -71,64 +69,132 @@ function tarikDataDariDatabase() {
             return Swal.fire('Data Tidak Cocok', 'Nomor NIS atau Tanggal Lahir santri yang Anda masukkan salah.', 'error');
         }
 
-      // Pasang Identitas
         document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
         document.getElementById('ortuNisSantri').innerText = santriTerpilih.nis;
         document.getElementById('ortuKelasSantri').innerText = santriTerpilih.kelas;
         
-        // Pasang Tambahan Jenis Kelamin, Orang Tua & Alamat
         document.getElementById('ortuJkSantri').innerText = santriTerpilih.jk ? santriTerpilih.jk : '-';
         let namaAyah = santriTerpilih.ayah ? santriTerpilih.ayah : '-';
         let namaIbu = santriTerpilih.ibu ? santriTerpilih.ibu : '-';
         document.getElementById('ortuNamaOrtu').innerText = namaAyah + " & " + namaIbu;
         document.getElementById('ortuAlamatSantri').innerText = santriTerpilih.alamat ? santriTerpilih.alamat : '-';
 
-		// Panggil fungsi riwayat SPP
-        muatRiwayatSpp(santriTerpilih.nis, ejaanTglLahir);
+        // Panggil SPP
+        muatRiwayatSpp(santriTerpilih.nis);
 
-        // Tarik Data Nilai & Pengaturan khusus untuk kelas santri terpilih
-     const fdNilai = new URLSearchParams();
-     fdNilai.append('action', 'getNilaiSantriPublik');
-     fdNilai.append('nis', inputNis);
-     fdNilai.append('tanggal_lahir', ejaanTglLahir);
+        // PERBAIKAN: Kembalikan pemanggilan Nilai dan Pengaturan standar
+        const fdNilai = new URLSearchParams();
+        fdNilai.append('action', 'getDataNilai');
+        fdNilai.append('kelas', santriTerpilih.kelas);
 
-     const fdPengaturan = new URLSearchParams();
-     fdPengaturan.append('action', 'getPengaturanSantriPublik');
-     fdPengaturan.append('nis', inputNis);
-     fdPengaturan.append('tanggal_lahir', ejaanTglLahir);
+        const fdPengaturan = new URLSearchParams();
+        fdPengaturan.append('action', 'getPengaturan');
+        fdPengaturan.append('kelas', santriTerpilih.kelas);
 
-     return Promise.all([
-         fetch(GAS_URL, { method: 'POST', body: fdNilai }).then(r => r.json()),
-         fetch(GAS_URL, { method: 'POST', body: fdPengaturan }).then(r => r.json())
-     ])
-     .then(([responseNilai, responsePengaturan]) => {
-         showLoading(false);
-         if (responseNilai.status !== 'success') {
-             return Swal.fire('Informasi', 'Data identitas benar, namun nilai kelas belum di-input guru.', 'info');
-         }
+        return Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: fdNilai }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: fdPengaturan }).then(r => r.json())
+        ])
+        .then(([responseNilai, responsePengaturan]) => {
+            showLoading(false);
+            if (responseNilai.status !== 'success') {
+                return Swal.fire('Informasi', 'Data identitas benar, namun nilai kelas belum di-input guru.', 'info');
+            }
 
-         // Cek Status Rilis & Tarik Data Pengaturan
-         let statusRilis = 'Sembunyi';
-         let detailRapor = {}; // <-- Wadah baru untuk menampung Kepribadian & Absensi
+            let statusRilis = 'Sembunyi';
+            let detailRapor = {}; 
 
-         if (responsePengaturan.status === 'success') {
-             if (responsePengaturan.umum && responsePengaturan.umum.status_rilis) {
-                 statusRilis = responsePengaturan.umum.status_rilis;
-             }
-             if (responsePengaturan.detail) {
-                 detailRapor = responsePengaturan.detail; // <-- Tangkap datanya disini
-             }
-         }
+            if (responsePengaturan.status === 'success') {
+                if (responsePengaturan.umum && responsePengaturan.umum.status_rilis) {
+                    statusRilis = responsePengaturan.umum.status_rilis;
+                }
+                if (responsePengaturan.detail) {
+                    detailRapor = responsePengaturan.detail; 
+                }
+            }
 
-         // Lanjut ke proses render (Tambahkan detailRapor di akhir)
-         prosesDanTampilkanData(inputNis, santriTerpilih.kelas, responseNilai.headers, responseNilai.data, statusRilis, detailRapor);
-     });
-		
+            prosesDanTampilkanData(inputNis, santriTerpilih.kelas, responseNilai.headers, responseNilai.data, statusRilis, detailRapor);
+        });
+        
     })
     .catch(err => {
         showLoading(false);
         Swal.fire('Koneksi Gagal', 'Gagal memuat informasi database dari server cloud.', 'error');
         console.error(err);
+    });
+}
+
+// PERBAIKAN: Kembalikan fungsi muatRiwayatSpp agar menggunakan action 'getSppSantri'
+function muatRiwayatSpp(nisSantri) {
+    const wadah = document.getElementById('wadahSppOrtu');
+    const elTagihan = document.getElementById('ortuTagihanSpp');
+    const elSisa = document.getElementById('ortuSisaSpp');
+    
+    wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>';
+    if (elTagihan) elTagihan.innerText = '-';
+    if (elSisa) elSisa.innerText = '-';
+    
+    // PERBAIKAN DI SINI
+    const fdSpp = new URLSearchParams();
+    fdSpp.append('action', 'getSppSantri');
+    fdSpp.append('nis', nisSantri);
+
+    const fdSetting = new URLSearchParams();
+    fdSetting.append('action', 'getSettingSpp');
+
+    Promise.all([
+        fetch(GAS_URL, { method: 'POST', body: fdSpp }).then(r => r.json()),
+        fetch(GAS_URL, { method: 'POST', body: fdSetting }).then(r => r.json())
+    ])
+    .then(([resSpp, resSetting]) => {
+        wadah.innerHTML = ''; 
+        
+        let totalTagihan = 0;
+        if (resSetting && resSetting.status === 'success') {
+            let nominal = parseFloat(resSetting.nominal) || 0;
+            let bulan = parseFloat(resSetting.bulan) || 0;
+            totalTagihan = nominal * bulan;
+        }
+
+        let totalTerbayar = 0;
+
+        if (resSpp.status === 'success' && resSpp.data.length > 0) {
+            resSpp.data.forEach(item => {
+                let nom = parseFloat(item.nominal) || 0;
+                totalTerbayar += nom;
+
+                let warnaTeks = item.status === 'LUNAS' ? 'text-emerald-600' : 'text-amber-600';
+                let warnaBg = item.status === 'LUNAS' ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100';
+
+                wadah.innerHTML += `
+                    <div class="flex justify-between items-center p-2.5 rounded-lg border text-xs ${warnaBg} mb-2 shadow-sm">
+                        <div>
+                            <span class="font-bold text-gray-700 block mb-0.5">${item.keterangan}</span>
+                            <span class="font-semibold text-blue-600">${formatRp(nom)}</span>
+                        </div>
+                        <span class="font-bold px-2 py-1 bg-white rounded-md ${warnaTeks} border shadow-sm">${item.status}</span>
+                    </div>
+                `;
+            });
+        } else {
+            wadah.innerHTML = `<div class="text-center text-xs text-gray-400 py-4 italic">Belum ada riwayat pembayaran yang tercatat.</div>`;
+        }
+
+        let sisaTunggakan = Math.max(0, totalTagihan - totalTerbayar);
+        
+        if (elTagihan) elTagihan.innerText = formatRp(totalTagihan);
+        if (elSisa) {
+            if (sisaTunggakan === 0) {
+                elSisa.innerHTML = '<i class="fas fa-check-circle mr-1"></i> LUNAS';
+                elSisa.className = "text-sm font-black text-emerald-600";
+            } else {
+                elSisa.innerText = formatRp(sisaTunggakan);
+                elSisa.className = "text-sm font-black text-red-500";
+            }
+        }
+    }).catch(e => {
+        wadah.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Gagal terhubung ke database.</div>`;
+        console.error(e);
     });
 }
 
