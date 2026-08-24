@@ -74,10 +74,23 @@
                     <label class="block text-xs font-bold text-emerald-100 mb-1">NIS (Nomor Induk Santri)</label>
                     <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full px-4 py-2.5 rounded-xl bg-white text-gray-800 focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-bold shadow-inner">
                 </div>
-               <div>
-                    <label class="block text-xs font-bold text-emerald-100 mb-1">Tanggal Lahir Santri</label>
-                    <input type="text" id="ortuTglLahir" placeholder="dd/mm/yyyy (Pilih Tanggal)" onfocus="this.type='date'; if(this.showPicker) this.showPicker();" onclick="if(this.type==='date' && this.showPicker) this.showPicker();" onblur="if(!this.value) this.type='text'" class="w-full px-4 py-2.5 rounded-xl bg-white text-gray-800 focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-medium shadow-inner">
+              <div>
+            <label class="block text-xs font-bold text-emerald-100 mb-1">Tanggal Lahir Santri</label>
+            <div class="relative">
+                <!-- Input ini SELALU bertipe date agar kalender langsung muncul di klik pertama -->
+                <input type="date" id="ortuTglLahir" required 
+                       class="peer w-full px-4 py-2.5 rounded-xl bg-white focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-medium shadow-inner"
+                       style="color: transparent;"
+                       onfocus="this.style.color = '#1f2937'"
+                       onblur="if(!this.value) this.style.color = 'transparent'"
+                       onchange="this.style.color = '#1f2937'">
+                
+                <!-- Tulisan Placeholder buatan ini menumpuk di atasnya dan akan hilang otomatis saat diklik -->
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 text-sm font-medium pointer-events-none peer-valid:hidden peer-focus:hidden">
+                    dd/mm/yyyy (Pilih Tanggal)
                 </div>
+            </div>
+        </div>
             </div>
 
            
