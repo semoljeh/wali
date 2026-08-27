@@ -6,21 +6,40 @@
 document.addEventListener("DOMContentLoaded", () => {
     const panelWelcome = document.getElementById('welcomeOrtu');
     
-    if (panelWelcome) {
-        // Pastikan halaman selalu tampil saat link baru dibuka
-        panelWelcome.classList.remove('hidden');
-        panelWelcome.classList.remove('opacity-0');
+    // CEK APAKAH ADA SESI TERSIMPAN DI MEMORI BROWSER
+    const savedNis = sessionStorage.getItem('ortuActiveNis');
+    const savedTgl = sessionStorage.getItem('ortuActiveTgl');
+
+    if (savedNis && savedTgl) {
+        // Jika ada memori, langsung isi form dan tarik data (Bypass Welcome Screen)
+        if (document.getElementById('ortuNis')) document.getElementById('ortuNis').value = savedNis;
+        if (document.getElementById('ortuTglLahir')) document.getElementById('ortuTglLahir').value = savedTgl;
+        
+        if (panelWelcome) {
+            panelWelcome.style.display = 'none'; // Kunci mati agar tidak berkedip
+            panelWelcome.classList.add('hidden');
+            panelWelcome.classList.add('opacity-0');
+        }
+        tarikDataDariDatabase();
+    } else {
+        // Jika tidak ada memori, tampilkan Welcome Screen seperti biasa
+        if (panelWelcome) {
+            panelWelcome.style.display = 'flex';
+            panelWelcome.classList.remove('hidden');
+            setTimeout(() => {
+                panelWelcome.classList.remove('opacity-0');
+            }, 50);
+        }
     }
 });
 
 function tutupWelcomeOrtu() {
     const panelWelcome = document.getElementById('welcomeOrtu');
-    if (panelWelcome) {
-        // Hanya jalankan animasi memudar tanpa menyimpan riwayat ke memori browser
+    if (panelWelcome && panelWelcome.style.display !== 'none') {
         panelWelcome.classList.add('opacity-0');
-        
         setTimeout(() => {
             panelWelcome.classList.add('hidden');
+            panelWelcome.style.display = 'none';
         }, 700); 
     }
 }
@@ -28,10 +47,8 @@ function tutupWelcomeOrtu() {
 let JADWAL_MAPEL = {};
 
 function showLoading(show) {
-    // 1. Tampilkan layar loading penuh
     document.getElementById('loadingScreen').style.display = show ? 'flex' : 'none';
     
-    // 2. Manipulasi tombol agar terlihat sedang memproses
     const btn = document.getElementById('btnMasukOrtu');
     if (btn) {
         if (show) {
@@ -55,6 +72,10 @@ function tarikDataDariDatabase() {
         return Swal.fire('Perhatian', 'Mohon isi Nomor NIS dan pilih Tanggal Lahir terlebih dahulu.', 'warning');
     }
 
+    // SIMPAN NIS & TANGGAL LAHIR KE MEMORI BROWSER
+    sessionStorage.setItem('ortuActiveNis', inputNis);
+    sessionStorage.setItem('ortuActiveTgl', inputTgl);
+
     showLoading(true);
 
     const objekTanggal = new Date(inputTgl);
@@ -76,7 +97,18 @@ function tarikDataDariDatabase() {
 
         if (!santriTerpilih) {
             showLoading(false);
-            containerHasil.classList.add('hidden');
+            if (containerHasil) containerHasil.classList.add('hidden');
+            
+            // Hapus memori jika ternyata datanya salah agar tidak nyangkut saat di-refresh
+            sessionStorage.removeItem('ortuActiveNis');
+            sessionStorage.removeItem('ortuActiveTgl');
+            
+            const panelWelcome = document.getElementById('welcomeOrtu');
+            if (panelWelcome) {
+                panelWelcome.style.display = 'flex';
+                panelWelcome.classList.remove('hidden');
+                setTimeout(() => panelWelcome.classList.remove('opacity-0'), 50);
+            }
             return Swal.fire('Data Tidak Cocok', 'Nomor NIS atau Tanggal Lahir santri yang Anda masukkan salah.', 'error');
         }
 
@@ -306,7 +338,8 @@ function prosesDanTampilkanData(nis, kelas, headers, rows, statusRilis, detailRa
 
     if (!adaNilai) {
         tbodyNilai.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400">Belum ada komponen mapel terinput.</td></tr>';
-        document.getElementById('footerTabelNilaiOrtu').classList.add('hidden');
+        const footerTabel = document.getElementById('footerTabelNilaiOrtu');
+        if (footerTabel) footerTabel.classList.add('hidden');
     } else {
         const footerTabel = document.getElementById('footerTabelNilaiOrtu');
         if(footerTabel) footerTabel.classList.remove('hidden');
@@ -412,6 +445,8 @@ function muatRiwayatSpp(nisSantri) {
     const elTagihan = document.getElementById('ortuTagihanSpp');
     const elSisa = document.getElementById('ortuSisaSpp');
     
+    if (!wadah) return;
+
     wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>';
     if (elTagihan) elTagihan.innerText = '-';
     if (elSisa) elSisa.innerText = '-';
@@ -572,12 +607,79 @@ function rotasiKutipan() {
     }, 500); 
 }
 
+// ==========================================
+// TAMBAHKAN KODE INI UNTUK MENYALAKAN QUOTES
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     rotasiKutipan();
-    setInterval(rotasiKutipan, 12000);
+    setInterval(rotasiKutipan, 12000); // Ganti teks setiap 12 detik
 });
+// ==========================================
 
+// =========================================================
+// FUNGSI KELUAR / CEK SANTRI LAIN
+// =========================================================
+function keluarPortal() {
+    Swal.fire({
+        title: 'Kembali?',
+        text: "Anda akan diarahkan kembali ke halaman awal.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#059669',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Kembali',
+        cancelButtonText: 'Batal',
+        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // HAPUS SESI DARI MEMORI BROWSER
+            sessionStorage.removeItem('ortuActiveNis');
+            sessionStorage.removeItem('ortuActiveTgl');
 
+            // 1. Kosongkan inputan
+            if (document.getElementById('ortuNis')) document.getElementById('ortuNis').value = '';
+            if (document.getElementById('ortuTglLahir')) document.getElementById('ortuTglLahir').value = '';
+            
+            // 2. Sembunyikan panel hasil
+            document.getElementById('hasilDataOrtu').classList.add('hidden');
+            
+            // 3. Munculkan kembali Welcome Screen dengan animasi
+            const panelWelcome = document.getElementById('welcomeOrtu');
+            if (panelWelcome) {
+                panelWelcome.style.display = 'flex'; // Pastikan terlihat
+                panelWelcome.classList.remove('hidden');
+                setTimeout(() => {
+                    panelWelcome.classList.remove('opacity-0');
+                }, 50);
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+}
+
+function infoPembayaran() {
+    Swal.fire({
+        title: '<span class="text-teal-700 font-bold">Informasi Pembayaran</span>',
+        html: `
+            <div class="text-left text-sm text-gray-600 space-y-3 mt-2">
+                <p>Pembayaran SPP dan administrasi lainnya dapat ditransfer ke rekening resmi Madrasah Darussalam:</p>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
+                    <p class="font-bold text-gray-800 text-lg tracking-widest">BSI: 1234567890</p>
+                    <p class="text-xs font-semibold text-gray-500 mt-1">a.n. Madrasah Darussalam</p>
+                </div>
+                <p class="text-xs text-red-500 italic mt-2">* Setelah melakukan transfer, harap kirim bukti pembayaran melalui ikon WhatsApp di pojok kanan bawah agar segera divalidasi oleh Admin.</p>
+            </div>
+        `,
+        confirmButtonColor: '#059669',
+        confirmButtonText: 'Mengerti',
+        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' }
+    });
+}
+
+// =========================================================
+// SCRIPT GESER WIDGET WA
+// =========================================================
 const waWidget = document.getElementById('wa-widget');
 const waLink = document.getElementById('wa-link');
 
