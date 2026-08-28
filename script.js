@@ -658,6 +658,9 @@ function keluarPortal() {
     });
 }
 
+// =========================================================
+// PERBAIKAN: Fungsi pop-up info pembayaran
+// =========================================================
 function infoPembayaran() {
     Swal.fire({
         title: '<span class="text-teal-700 font-bold">Informasi Pembayaran</span>',
@@ -673,9 +676,33 @@ function infoPembayaran() {
         `,
         confirmButtonColor: '#059669',
         confirmButtonText: 'Mengerti',
-        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' }
+        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' },
+        
+        // --- TAMBAHAN KODE UNTUK MENANGANI TOMBOL BACK ---
+        didOpen: () => {
+            // Saat pop-up terbuka, tambahkan "riwayat palsu" ke browser
+            history.pushState({ swalModal: true }, null, location.href);
+        },
+        willClose: () => {
+            // Jika wali santri menutup pop-up lewat tombol "Mengerti" atau klik di luar kotak,
+            // kita harus membuang "riwayat palsu" tadi agar tombol back tetap normal
+            if (history.state && history.state.swalModal) {
+                history.back();
+            }
+        }
     });
 }
+
+// =========================================================
+// TAMBAHAN KODE: Event Listener Global untuk Tombol Back
+// (Letakkan di bagian bawah file script.js)
+// =========================================================
+window.addEventListener('popstate', function (event) {
+    // Jika tombol back ditekan dan ada SweetAlert yang sedang terbuka, tutup alert-nya!
+    if (Swal.isVisible()) {
+        Swal.close();
+    }
+});
 
 // =========================================================
 // SCRIPT GESER WIDGET WA
