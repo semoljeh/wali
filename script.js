@@ -658,34 +658,40 @@ function keluarPortal() {
     });
 }
 
+
 // =========================================================
-// PERBAIKAN: Fungsi pop-up info pembayaran
+// PERBAIKAN: Fungsi pop-up info pembayaran (Versi Bayar Langsung/Tunai)
 // =========================================================
 function infoPembayaran() {
     Swal.fire({
         title: '<span class="text-teal-700 font-bold">Informasi Pembayaran</span>',
         html: `
-            <div class="text-left text-sm text-gray-600 space-y-3 mt-2">
-                <p>Pembayaran SPP dan administrasi lainnya dapat ditransfer ke rekening resmi Madrasah Darussalam:</p>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
-                    <p class="font-bold text-gray-800 text-lg tracking-widest">BSI: 1234567890</p>
-                    <p class="text-xs font-semibold text-gray-500 mt-1">a.n. Madrasah Darussalam</p>
+            <div class="text-left text-sm text-gray-600 space-y-3 mt-2 leading-relaxed">
+                <p>Assalamu'alaikum Bapak/Ibu Wali Santri,</p>
+                
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center shadow-sm">
+                    <i class="fas fa-hand-holding-usd text-amber-500 text-3xl mb-2"></i>
+                    <p class="font-medium text-gray-800 text-sm">
+                        Mohon maaf, saat ini fasilitas pembayaran melalui <strong>transfer bank belum tersedia</strong>.
+                    </p>
                 </div>
-                <p class="text-xs text-red-500 italic mt-2">* Setelah melakukan transfer, harap kirim bukti pembayaran melalui ikon WhatsApp di pojok kanan bawah agar segera divalidasi oleh Admin.</p>
+
+                <p>Untuk pembayaran SPP dan administrasi lainnya, mohon perkenan Bapak/Ibu untuk membayarkannya secara <strong>tunai langsung kepada Bendahara Madrasah Darussalam</strong> pada jam sekolah.</p>
+                
+                <p class="text-xs text-teal-700 italic mt-3 border-t pt-3">
+                    * Jika ada pertanyaan terkait tunggakan, silakan hubungi admin kami melalui ikon WhatsApp di pojok kanan bawah. Terima kasih atas pengertian dan kerjasamanya.
+                </p>
             </div>
         `,
         confirmButtonColor: '#059669',
-        confirmButtonText: 'Mengerti',
+        confirmButtonText: 'Terima Kasih',
         customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' },
         
-        // --- TAMBAHAN KODE UNTUK MENANGANI TOMBOL BACK ---
+        // --- LOGIKA MENANGANI TOMBOL BACK (TETAP DIPERTAHANKAN) ---
         didOpen: () => {
-            // Saat pop-up terbuka, tambahkan "riwayat palsu" ke browser
             history.pushState({ swalModal: true }, null, location.href);
         },
         willClose: () => {
-            // Jika wali santri menutup pop-up lewat tombol "Mengerti" atau klik di luar kotak,
-            // kita harus membuang "riwayat palsu" tadi agar tombol back tetap normal
             if (history.state && history.state.swalModal) {
                 history.back();
             }
