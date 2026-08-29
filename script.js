@@ -988,69 +988,90 @@ window.addEventListener('popstate', function (event) {
 // =========================================================
 // FUNGSI MUAT PENGUMUMAN DINAMIS DARI DATABASE
 // =========================================================
+// =========================================================
+// FUNGSI MUAT PENGUMUMAN DINAMIS & WADAH KOSONG (PERMANEN)
+// =========================================================
 function muatPengumumanPublik() {
     const wadah = document.getElementById('wadahPengumumanPublik');
     if (!wadah) return;
 
-    // Menampilkan loading saat data ditarik
+    // Loading State
     wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-10"><i class="fas fa-spinner fa-spin mr-1"></i> Sedang memuat informasi dari server...</div>';
 
     const fdPengumuman = new URLSearchParams();
     fdPengumuman.append('action', 'getPengumuman');
 
-    // Menarik data dari Google Sheets (GAS_URL)
+    // Daftar 5 Kategori Wadah Permanen beserta teks bawaannya
+    const kategoriTetap = [
+        { id: "Lomba", badge: "bg-orange-100 text-orange-600 border-orange-200", jdlKosong: "Informasi Perlombaan", isiKosong: "Belum ada agenda perlombaan terdekat. Mohon wali santri mengecek portal ini secara berkala." },
+        { id: "Libur", badge: "bg-red-100 text-red-600 border-red-200", jdlKosong: "Jadwal Libur Madrasah", isiKosong: "Belum ada jadwal libur dalam waktu dekat." },
+        { id: "Ujian", badge: "bg-purple-100 text-purple-600 border-purple-200", jdlKosong: "Pelaksanaan Ujian", isiKosong: "Belum ada jadwal ujian semester atau evaluasi terdekat." },
+        { id: "Akademik", badge: "bg-blue-100 text-blue-600 border-blue-200", jdlKosong: "Info Akademik & Rapor", isiKosong: "Belum ada pengumuman terkait akademik atau pembagian rapor." },
+        { id: "Kegiatan", badge: "bg-emerald-100 text-emerald-600 border-emerald-200", jdlKosong: "Kegiatan & Haflah", isiKosong: "Belum ada agenda kegiatan madrasah atau peringatan Haflah terdekat." }
+    ];
+
+    // Menarik data asli dari server Google Sheets
     fetch(GAS_URL, { method: 'POST', body: fdPengumuman })
         .then(response => response.json())
         .then(res => {
             wadah.innerHTML = ''; 
+            // Ambil data server jika ada, jika gagal anggap array kosong
+            let dataServer = (res.status === 'success' && res.data) ? res.data : [];
 
-            if (res.status === 'success' && res.data.length > 0) {
-res.data.forEach(item => {
-                    // Deteksi warna otomatis berdasarkan kata di kategori
-                    let badgeClass = "bg-gray-100 text-gray-600 border-gray-200"; // Default
-                    let cat = item.kategori ? item.kategori.toUpperCase() : "";
-                    
-                    if (cat.includes("LIBUR")) badgeClass = "bg-red-100 text-red-600 border-red-200";
-                    else if (cat.includes("UJIAN")) badgeClass = "bg-purple-100 text-purple-600 border-purple-200";
-                    else if (cat.includes("LOMBA")) badgeClass = "bg-orange-100 text-orange-600 border-orange-200";
-                    else if (cat.includes("AKADEMIK")) badgeClass = "bg-blue-100 text-blue-600 border-blue-200";
-                    else if (cat.includes("KEGIATAN") || cat.includes("HAFLAH")) badgeClass = "bg-emerald-100 text-emerald-600 border-emerald-200";
+            // Looping ke 5 wadah permanen secara berurutan
+            kategoriTetap.forEach(kat => {
+                
+                // Cari apakah ada pengumuman asli dari server untuk kategori ini
+                let adaPengumuman = dataServer.filter(item => item.kategori && item.kategori.toUpperCase().includes(kat.id.toUpperCase()));
 
-                    // KODE BARU: Mengamankan tanda petik dan tombol "Enter" agar tidak merusak tombol HTML
-                    const safeJdl = item.judul ? item.judul.replace(/'/g, "\\'") : "";
-                    const safeTgl = item.tanggal ? item.tanggal.replace(/'/g, "\\'") : "";
-                    const safeIsi = item.isi ? item.isi.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") : "";
+                if (adaPengumuman.length > 0) {
+                    // JIKA ADA ISI: Tampilkan kartu menyala (Bisa lebih dari 1 per kategori)
+                    adaPengumuman.forEach(item => {
+                        const safeJdl = item.judul ? item.judul.replace(/'/g, "\\'") : "";
+                        const safeTgl = item.tanggal ? item.tanggal.replace(/'/g, "\\'") : "";
+                        const safeIsi = item.isi ? item.isi.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") : "";
 
+                        wadah.innerHTML += `
+                            <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
+                                <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
+                                    <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${kat.badge}">
+                                        ${item.kategori}
+                                    </span>
+                                    <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
+                                </div>
+                                <div class="flex-1 pt-1.5 sm:pt-0 pr-8 sm:pr-10">
+                                    <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
+                                   <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${item.isi}</p>
+                                </div>
+                                <button onclick="bagikanKeWA('${safeJdl}', '${safeTgl}', '${safeIsi}')" 
+                                        class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
+                                        title="Bagikan ke WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+               } else {
+                    // JIKA KOSONG: Tampilkan "Wadah" dengan teks yang lebih tebal dan jelas
                     wadah.innerHTML += `
-                        <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
-                            <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
-                                <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${badgeClass}">
-                                    ${item.kategori}
+                        <div class="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl flex flex-col sm:flex-row gap-3 relative mb-3">
+                            <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-200 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
+                                <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${kat.badge}">
+                                    ${kat.id}
                                 </span>
-                                <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
+                                <p class="text-[10px] font-bold text-gray-500"><i class="far fa-clock mr-1"></i> Menunggu Jadwal</p>
                             </div>
                             <div class="flex-1 pt-1.5 sm:pt-0 pr-8 sm:pr-10">
-                                <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
-                               <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${item.isi}</p>
+                                <h6 class="text-sm font-bold text-gray-700 mb-1 leading-tight">${kat.jdlKosong}</h6>
+                               <p class="text-xs text-gray-500 leading-relaxed italic whitespace-pre-line">${kat.isiKosong}</p>
                             </div>
-                            
-                            <!-- PERBAIKAN: Memanggil variabel safeJdl, safeTgl, dan safeIsi yang sudah diamankan -->
-                            <button onclick="bagikanKeWA('${safeJdl}', '${safeTgl}', '${safeIsi}')" 
-                                    class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
-                                    title="Bagikan ke WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
                         </div>
                     `;
-                });
-            } else {
-                // Jika sheet Pengumuman kosong
-                wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-10 italic">Belum ada pengumuman terbaru saat ini.</div>';
-            }
+                }
+            });
         })
         .catch(err => {
             wadah.innerHTML = '<div class="text-center text-xs text-red-400 py-10">Koneksi terputus. Gagal memuat pengumuman.</div>';
-            console.error(err);
         });
 }
 
