@@ -660,34 +660,70 @@ function keluarPortal() {
 
 
 // =========================================================
-// PERBAIKAN: Fungsi pop-up info pembayaran (Versi Bayar Langsung/Tunai)
+// PERBAIKAN: Fungsi pop-up info pembayaran (Responsif Semua Layar)
 // =========================================================
 function infoPembayaran() {
     Swal.fire({
-        title: '<span class="text-teal-700 font-bold">Informasi Pembayaran</span>',
+        title: '<span class="text-teal-700 font-bold text-lg sm:text-xl">Informasi Pembayaran</span>',
         html: `
-            <div class="text-left text-sm text-gray-600 space-y-3 mt-2 leading-relaxed">
+            <div class="text-left text-xs sm:text-sm text-gray-600 space-y-3 mt-1 sm:mt-2 leading-relaxed">
                 <p>Assalamu'alaikum Bapak/Ibu Wali Santri,</p>
                 
-                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center shadow-sm">
-                    <i class="fas fa-hand-holding-usd text-amber-500 text-3xl mb-2"></i>
-                    <p class="font-medium text-gray-800 text-sm">
-                        Mohon maaf, saat ini fasilitas pembayaran melalui <strong>transfer bank belum tersedia</strong>.
-                    </p>
+                <!-- Kotak Info Nominal Syahriah -->
+                <div class="bg-emerald-50 p-3 sm:p-4 rounded-xl border border-emerald-200 shadow-sm">
+                    <h6 class="font-bold text-emerald-800 mb-2 sm:mb-3 border-b border-emerald-200 pb-2 flex items-center text-xs sm:text-sm">
+                        <i class="fas fa-file-invoice-dollar mr-2"></i> Rincian Biaya Syahriah (SPP)
+                    </h6>
+                    <ul class="text-gray-700 space-y-2">
+                        <!-- Susunan otomatis ke bawah di layar sangat kecil, menyamping di layar besar -->
+                        <li class="flex flex-col sm:flex-row justify-between sm:items-center gap-0.5 sm:gap-0">
+                            <span>Biaya Bulanan:</span>
+                            <strong class="text-emerald-700 text-sm sm:text-base">Rp 15.000 <span class="text-[10px] sm:text-xs font-normal">/bulan</span></strong>
+                        </li>
+                        <li class="flex flex-col sm:flex-row justify-between sm:items-start pt-1 gap-0.5 sm:gap-0">
+                            <span>Lunas 1 Tahun:</span>
+                            <div class="text-left sm:text-right">
+                                <strong class="text-emerald-700 text-sm sm:text-base">Rp 165.000</strong>
+                                <p class="text-[9px] sm:text-[10px] text-emerald-600 italic leading-tight">
+                                    (Total bayar 11 bulan)
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                    
+                    <!-- Keterangan Khusus Ramadhan -->
+                    <div class="mt-3 sm:mt-4 bg-white p-2 sm:p-2.5 rounded-lg border border-emerald-100 text-[10px] sm:text-[11px] text-center shadow-sm">
+                        <i class="fas fa-gift text-emerald-500 mr-1"></i> Khusus <span class="line-through decoration-red-500 decoration-2 font-bold text-gray-500">BULAN RAMADHAN</span> santri dibebaskan dari biaya SPP (Gratis).
+                    </div>
                 </div>
 
-                <p>Untuk pembayaran SPP dan administrasi lainnya, mohon perkenan Bapak/Ibu untuk membayarkannya secara <strong>tunai langsung kepada Bendahara Madrasah Darussalam</strong> pada jam sekolah.</p>
+                <!-- Kotak Peringatan Bayar Tunai -->
+                <div class="bg-amber-50 p-3 sm:p-4 rounded-xl border border-amber-200 shadow-sm mt-2 sm:mt-3">
+                    <p class="font-bold text-gray-800 text-xs sm:text-sm mb-1.5 flex items-center">
+                        <i class="fas fa-hand-holding-usd text-amber-500 text-base sm:text-lg mr-2"></i> Metode Pembayaran
+                    </p>
+                    <p class="text-[11px] sm:text-xs text-gray-700 leading-relaxed">
+                        Mohon maaf, saat ini fasilitas transfer bank belum tersedia. Mohon perkenan Bapak/Ibu untuk membayarkannya secara <strong>tunai langsung kepada Bendahara Madrasah</strong> pada jam sekolah.
+                    </p>
+                </div>
                 
-                <p class="text-xs text-teal-700 italic mt-3 border-t pt-3">
-                    * Jika ada pertanyaan terkait tunggakan, silakan hubungi admin kami melalui ikon WhatsApp di pojok kanan bawah. Terima kasih atas pengertian dan kerjasamanya.
+                <p class="text-[10px] sm:text-[11px] text-teal-700 italic mt-3 sm:mt-4 border-t pt-3">
+                    * Jika ada pertanyaan lebih lanjut, silakan hubungi admin melalui ikon WhatsApp di pojok kanan bawah.
                 </p>
             </div>
         `,
         confirmButtonColor: '#059669',
         confirmButtonText: 'Terima Kasih',
-        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' },
         
-        // --- LOGIKA MENANGANI TOMBOL BACK (TETAP DIPERTAHANKAN) ---
+        // --- KONFIGURASI RESPONSIVITAS SWEETALERT ---
+        width: '92%', // Menggunakan persentase agar otomatis pas di layar HP
+        padding: '1.25em', // Mengurangi padding bawaan agar ruang konten lebih lega di HP
+        customClass: { 
+            popup: 'rounded-2xl max-w-md', // Membatasi lebar maksimal di laptop agar tidak terlalu melebar
+            confirmButton: 'rounded-xl text-sm px-5 py-2 font-bold shadow-md' 
+        },
+        
+        // --- LOGIKA MENANGANI TOMBOL BACK DI HP ---
         didOpen: () => {
             history.pushState({ swalModal: true }, null, location.href);
         },
