@@ -617,47 +617,65 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 
 // =========================================================
-// FUNGSI KELUAR / CEK SANTRI LAIN
+// FUNGSI KELUAR / CEK SANTRI LAIN (DENGAN AUTO-CLEAR CACHE)
 // =========================================================
 function keluarPortal() {
     Swal.fire({
         title: 'Kembali?',
-        text: "Anda akan diarahkan kembali ke halaman awal.",
+        text: "Anda akan keluar dan sistem akan membersihkan memori agar aplikasi tetap optimal.",
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#059669',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Kembali',
+        confirmButtonText: 'Ya, Keluar',
         cancelButtonText: 'Batal',
         customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
     }).then((result) => {
         if (result.isConfirmed) {
-            // HAPUS SESI DARI MEMORI BROWSER
+            
+            // 1. Tampilkan loading agar user tahu sistem sedang bekerja
+            Swal.fire({
+                title: 'Membersihkan Data...',
+                text: 'Mohon tunggu sebentar.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // 2. Hapus Sesi Akun dari Storage
             sessionStorage.removeItem('ortuActiveNis');
             sessionStorage.removeItem('ortuActiveTgl');
+            localStorage.clear(); // Bersihkan juga local storage jika ada
 
-            // 1. Kosongkan inputan
-            if (document.getElementById('ortuNis')) document.getElementById('ortuNis').value = '';
-            if (document.getElementById('ortuTglLahir')) document.getElementById('ortuTglLahir').value = '';
-            
-            // 2. Sembunyikan panel hasil
-            document.getElementById('hasilDataOrtu').classList.add('hidden');
-            
-            // 3. Munculkan kembali Welcome Screen dengan animasi
-            const panelWelcome = document.getElementById('welcomeOrtu');
-            if (panelWelcome) {
-                panelWelcome.style.display = 'flex'; // Pastikan terlihat
-                panelWelcome.classList.remove('hidden');
-                setTimeout(() => {
-                    panelWelcome.classList.remove('opacity-0');
-                }, 50);
+            // 3. Bersihkan Cache Storage (PWA)
+            if ('caches' in window) {
+                caches.keys().then((names) => {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
             }
+
+            // 4. Unregister Service Worker (PWA)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+
+            // 5. Beri sedikit jeda agar proses penghapusan selesai, lalu Reload halaman paksa
+            setTimeout(() => {
+                // Memaksa browser mengambil ulang dari server, bukan dari cache
+                window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+            }, 1000);
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 }
-
 
 // =========================================================
 // PERBAIKAN: Fungsi pop-up info pembayaran (Responsif Semua Layar)
@@ -827,3 +845,22 @@ if (waWidget && waLink) {
         }
     });
 }
+
+
+// =========================================================
+// AUTO-CLEAR CACHE YANG AMAN DARI REFRESH
+// =========================================================
+window.addEventListener('pagehide', function() {
+    // KITA TIDAK MENGHAPUS sessionStorage DI SINI.
+    // Biarkan browser yang otomatis menghapusnya saat aplikasi benar-benar di-close.
+    // Dengan begini, kalau wali santri cuma me-refresh halaman, mereka tidak akan ter-logout.
+
+    // Kita hanya fokus menghapus file cache PWA (CSS/JS lama) di latar belakang
+    if ('caches' in window) {
+        caches.keys().then(function(cacheNames) {
+            cacheNames.forEach(function(cacheName) {
+                caches.delete(cacheName);
+            });
+        });
+    }
+});
