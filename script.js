@@ -962,70 +962,65 @@ window.addEventListener('popstate', function (event) {
 });
 
 // =========================================================
-// FUNGSI MUAT PENGUMUMAN (Versi Tema Terang)
+// FUNGSI MUAT PENGUMUMAN DINAMIS DARI DATABASE
 // =========================================================
 function muatPengumumanPublik() {
     const wadah = document.getElementById('wadahPengumumanPublik');
     if (!wadah) return;
 
-    const dataPengumuman = [
-        {
-            tanggal: "12 September 2026",
-            judul: "Libur Peringatan Maulid Nabi",
-            isi: "Kegiatan belajar mengajar diliburkan. Santri kembali masuk seperti biasa pada hari Rabu, 16 September 2026.",
-            kategori: "Libur",
-            badgeClass: "bg-red-100 text-red-600 border-red-200" 
-        },
-        {
-            tanggal: "05 Oktober 2026",
-            judul: "Ujian Penilaian Tengah Semester (PTS)",
-            isi: "Pelaksanaan ujian tertulis dan praktik semester ganjil. Mohon wali santri turut mendampingi waktu belajar putra-putrinya di rumah.",
-            kategori: "Ujian",
-            badgeClass: "bg-purple-100 text-purple-600 border-purple-200"
-        },
-        {
-            tanggal: "20 Oktober 2026",
-            judul: "Pengumuman Pembagian Rapor",
-            isi: "Wali santri diharap hadir di kelas masing-masing pada pukul 08:00 WIB. Login ke portal ini untuk melihat pratinjau nilai anak Anda.",
-            kategori: "Akademik",
-            badgeClass: "bg-blue-100 text-blue-600 border-blue-200"
-        },
-        {
-            tanggal: "15 Desember 2026",
-            judul: "Haflah Akhirussanah & Wisuda",
-            isi: "Acara puncak perayaan tahunan Madrasah Darussalam. Undangan resmi akan segera didistribusikan melalui wali kelas.",
-            kategori: "Kegiatan",
-            badgeClass: "bg-emerald-100 text-emerald-600 border-emerald-200"
-        }
-    ];
+    // Menampilkan loading saat data ditarik
+    wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-10"><i class="fas fa-spinner fa-spin mr-1"></i> Sedang memuat informasi dari server...</div>';
 
-    wadah.innerHTML = ''; 
-    
-    // Looping data dan ubah warna teks ke versi terang (latar putih)
-    dataPengumuman.forEach(item => {
-        wadah.innerHTML += `
-            <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
-                
-                <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
-                    <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${item.badgeClass}">
-                        ${item.kategori}
-                    </span>
-                    <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
-                </div>
-                
-                <div class="flex-1 pt-1.5 sm:pt-0 pr-8 sm:pr-10">
-                    <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
-                    <p class="text-xs text-gray-600 leading-relaxed">${item.isi}</p>
-                </div>
+    const fdPengumuman = new URLSearchParams();
+    fdPengumuman.append('action', 'getPengumuman');
 
-                <button onclick="bagikanKeWA('${item.judul}', '${item.tanggal}', '${item.isi}')" 
-                        class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
-                        title="Bagikan ke WhatsApp">
-                    <i class="fab fa-whatsapp"></i>
-                </button>
-            </div>
-        `;
-    });
+    // Menarik data dari Google Sheets (GAS_URL)
+    fetch(GAS_URL, { method: 'POST', body: fdPengumuman })
+        .then(response => response.json())
+        .then(res => {
+            wadah.innerHTML = ''; 
+
+            if (res.status === 'success' && res.data.length > 0) {
+                res.data.forEach(item => {
+                    // Deteksi warna otomatis berdasarkan kata di kategori
+                    let badgeClass = "bg-gray-100 text-gray-600 border-gray-200"; // Default
+                    let cat = item.kategori ? item.kategori.toUpperCase() : "";
+                    
+                    if (cat.includes("LIBUR")) badgeClass = "bg-red-100 text-red-600 border-red-200";
+                    else if (cat.includes("UJIAN")) badgeClass = "bg-purple-100 text-purple-600 border-purple-200";
+                    else if (cat.includes("LOMBA")) badgeClass = "bg-orange-100 text-orange-600 border-orange-200";
+                    else if (cat.includes("AKADEMIK")) badgeClass = "bg-blue-100 text-blue-600 border-blue-200";
+                    else if (cat.includes("KEGIATAN") || cat.includes("HAFLAH")) badgeClass = "bg-emerald-100 text-emerald-600 border-emerald-200";
+
+                    wadah.innerHTML += `
+                        <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
+                            <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
+                                <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${badgeClass}">
+                                    ${item.kategori}
+                                </span>
+                                <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
+                            </div>
+                            <div class="flex-1 pt-1.5 sm:pt-0 pr-8 sm:pr-10">
+                                <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
+                               <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${item.isi}</p>
+                            </div>
+                            <button onclick="bagikanKeWA('${item.judul}', '${item.tanggal}', '${item.isi}')" 
+                                    class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
+                                    title="Bagikan ke WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            } else {
+                // Jika sheet Pengumuman kosong
+                wadah.innerHTML = '<div class="text-center text-xs text-gray-400 py-10 italic">Belum ada pengumuman terbaru saat ini.</div>';
+            }
+        })
+        .catch(err => {
+            wadah.innerHTML = '<div class="text-center text-xs text-red-400 py-10">Koneksi terputus. Gagal memuat pengumuman.</div>';
+            console.error(err);
+        });
 }
 
 // =========================================================
