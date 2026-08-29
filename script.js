@@ -6,25 +6,28 @@
 document.addEventListener("DOMContentLoaded", () => {
     const panelWelcome = document.getElementById('welcomeOrtu');
     
+    // --- PANGGIL PENGUMUMAN PUBLIK DI SINI ---
+    muatPengumumanPublik();
+    
     // CEK APAKAH ADA SESI TERSIMPAN DI MEMORI BROWSER
     const savedNis = sessionStorage.getItem('ortuActiveNis');
     const savedTgl = sessionStorage.getItem('ortuActiveTgl');
 
     if (savedNis && savedTgl) {
-        // Jika ada memori, langsung isi form dan tarik data (Bypass Welcome Screen)
+        // Jika ada memori, sembunyikan Welcome Screen & tarik data
         if (document.getElementById('ortuNis')) document.getElementById('ortuNis').value = savedNis;
         if (document.getElementById('ortuTglLahir')) document.getElementById('ortuTglLahir').value = savedTgl;
         
         if (panelWelcome) {
-            panelWelcome.style.display = 'none'; // Kunci mati agar tidak berkedip
+            panelWelcome.style.display = 'none'; 
             panelWelcome.classList.add('hidden');
             panelWelcome.classList.add('opacity-0');
         }
         tarikDataDariDatabase();
     } else {
-        // Jika tidak ada memori, tampilkan Welcome Screen seperti biasa
+        // Jika tidak ada memori, biarkan Welcome Screen menutupi layar
         if (panelWelcome) {
-            panelWelcome.style.display = 'flex';
+            panelWelcome.style.display = ''; // Dikosongkan agar mengikuti bawaan CSS
             panelWelcome.classList.remove('hidden');
             setTimeout(() => {
                 panelWelcome.classList.remove('opacity-0');
@@ -864,3 +867,276 @@ window.addEventListener('pagehide', function() {
         });
     }
 });
+
+
+// =========================================================
+// FUNGSI ANIMASI BOTTOM SHEET PENGUMUMAN & TOMBOL BACK
+// =========================================================
+function bukaPanelPengumuman() {
+    const panel = document.getElementById('panelBottomPengumuman');
+    const backdrop = document.getElementById('backdropPengumuman');
+    
+    if (panel && backdrop) {
+        backdrop.classList.remove('hidden');
+        
+        // Memasukkan state ke memori HP agar tombol Back terdeteksi
+        history.pushState({ panelPengumumanTerbuka: true }, null, location.href);
+        
+        // Jeda waktu agar CSS Animation berjalan mulus
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            panel.classList.remove('translate-y-full'); 
+        }, 10);
+    }
+}
+
+function tutupPanelPengumuman(dariTombolBack = false) {
+    const panel = document.getElementById('panelBottomPengumuman');
+    const backdrop = document.getElementById('backdropPengumuman');
+    
+    if (panel && backdrop) {
+        backdrop.classList.add('opacity-0');
+        panel.classList.add('translate-y-full'); 
+        
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+        }, 300);
+        
+        // Jika ditutup lewat tombol X, hapus history palsu agar sistem Back HP tetap bersih
+        if (!dariTombolBack && history.state && history.state.panelPengumumanTerbuka) {
+            history.back(); 
+        }
+    }
+}
+
+// Event Listener Global untuk menangkap tekanan tombol Back di HP
+window.addEventListener('popstate', function (event) {
+    // 1. Tutup peringatan SweetAlert jika kebetulan sedang muncul
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+        Swal.close();
+    }
+    
+    // 2. Tutup panel pengumuman jika sedang terbuka
+    const panelPengumuman = document.getElementById('panelBottomPengumuman');
+    if (panelPengumuman && !panelPengumuman.classList.contains('translate-y-full')) {
+        tutupPanelPengumuman(true); // Melewati nilai 'true' agar tidak bentrok dengan history
+    }
+});
+
+function tutupPanelPengumuman(dariTombolBack = false) {
+    const panel = document.getElementById('panelBottomPengumuman');
+    const backdrop = document.getElementById('backdropPengumuman');
+    
+    if (panel && backdrop) {
+        backdrop.classList.add('opacity-0');
+        panel.classList.add('translate-y-full'); // Geser turun
+        
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+        }, 300);
+        
+        if (!dariTombolBack && history.state && history.state.panelPengumumanTerbuka) {
+            history.back(); // Bersihkan state jika ditutup manual (lewat tombol X)
+        }
+    }
+}
+
+// =========================================================
+// Event Listener Global untuk Tombol Back HP
+// =========================================================
+window.addEventListener('popstate', function (event) {
+    // 1. Tutup SweetAlert jika terbuka
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) Swal.close();
+    
+    // 2. Tutup Modal Login jika terbuka
+    const modalLogin = document.getElementById('modalLogin');
+    if (modalLogin && !modalLogin.classList.contains('hidden')) {
+        tutupModalLogin(true); 
+    }
+    
+    // 3. Tutup Panel Pengumuman jika terbuka
+    const panelPengumuman = document.getElementById('panelBottomPengumuman');
+    if (panelPengumuman && !panelPengumuman.classList.contains('translate-y-full')) {
+        tutupPanelPengumuman(true);
+    }
+});
+
+// =========================================================
+// FUNGSI MUAT PENGUMUMAN (Versi Tema Terang)
+// =========================================================
+function muatPengumumanPublik() {
+    const wadah = document.getElementById('wadahPengumumanPublik');
+    if (!wadah) return;
+
+    const dataPengumuman = [
+        {
+            tanggal: "12 September 2026",
+            judul: "Libur Peringatan Maulid Nabi",
+            isi: "Kegiatan belajar mengajar diliburkan. Santri kembali masuk seperti biasa pada hari Rabu, 16 September 2026.",
+            kategori: "Libur",
+            badgeClass: "bg-red-100 text-red-600 border-red-200" 
+        },
+        {
+            tanggal: "05 Oktober 2026",
+            judul: "Ujian Penilaian Tengah Semester (PTS)",
+            isi: "Pelaksanaan ujian tertulis dan praktik semester ganjil. Mohon wali santri turut mendampingi waktu belajar putra-putrinya di rumah.",
+            kategori: "Ujian",
+            badgeClass: "bg-purple-100 text-purple-600 border-purple-200"
+        },
+        {
+            tanggal: "20 Oktober 2026",
+            judul: "Pengumuman Pembagian Rapor",
+            isi: "Wali santri diharap hadir di kelas masing-masing pada pukul 08:00 WIB. Login ke portal ini untuk melihat pratinjau nilai anak Anda.",
+            kategori: "Akademik",
+            badgeClass: "bg-blue-100 text-blue-600 border-blue-200"
+        },
+        {
+            tanggal: "15 Desember 2026",
+            judul: "Haflah Akhirussanah & Wisuda",
+            isi: "Acara puncak perayaan tahunan Madrasah Darussalam. Undangan resmi akan segera didistribusikan melalui wali kelas.",
+            kategori: "Kegiatan",
+            badgeClass: "bg-emerald-100 text-emerald-600 border-emerald-200"
+        }
+    ];
+
+    wadah.innerHTML = ''; 
+    
+    // Looping data dan ubah warna teks ke versi terang (latar putih)
+    dataPengumuman.forEach(item => {
+        wadah.innerHTML += `
+            <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
+                
+                <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 sm:pb-0 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
+                    <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${item.badgeClass}">
+                        ${item.kategori}
+                    </span>
+                    <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
+                </div>
+                
+                <div class="flex-1 pt-1.5 sm:pt-0 pr-8 sm:pr-10">
+                    <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
+                    <p class="text-xs text-gray-600 leading-relaxed">${item.isi}</p>
+                </div>
+
+                <button onclick="bagikanKeWA('${item.judul}', '${item.tanggal}', '${item.isi}')" 
+                        class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
+                        title="Bagikan ke WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+            </div>
+        `;
+    });
+}
+
+// =========================================================
+// FUNGSI SHARE PENGUMUMAN KE WHATSAPP
+// =========================================================
+function bagikanKeWA(judul, tanggal, isi) {
+    // 1. Merangkai teks dengan format bawaan WA (* untuk tebal, _ untuk miring)
+    const teksWA = `📢 *${judul}*\n🗓️ ${tanggal}\n\n${isi}\n\n🌐 _Portal Informasi Madrasah Darussalam_`;
+    
+    // 2. Mengubah teks menjadi format URL yang valid
+    const urlEncodedText = encodeURIComponent(teksWA);
+    
+    // 3. Membuka link WhatsApp (akan otomatis membuka aplikasi WA di HP)
+    window.open(`https://wa.me/?text=${urlEncodedText}`, '_blank');
+}
+
+// =========================================================
+// FUNGSI ANIMASI POP-UP FORM LOGIN & BACK BUTTON HANDLER
+// =========================================================
+function bukaModalLogin() {
+    const modal = document.getElementById('modalLogin');
+    const content = document.getElementById('modalLoginContent');
+    
+    if (modal && content) {
+        modal.classList.remove('hidden'); 
+        
+        // Tambahkan state riwayat palsu agar tombol Back HP berfungsi menutup modal
+        history.pushState({ modalLoginTerbuka: true }, null, location.href);
+        
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function tutupModalLogin(dariTombolBack = false) {
+    const modal = document.getElementById('modalLogin');
+    const content = document.getElementById('modalLoginContent');
+    
+    if (modal && content) {
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); 
+
+        // Jika ditutup lewat tombol X (bukan tombol Back HP), bersihkan state riwayat
+        if (!dariTombolBack && history.state && history.state.modalLoginTerbuka) {
+            history.back();
+        }
+    }
+}
+
+// =========================================================
+// Event Listener Global untuk Tombol Back (SweetAlert & Modal Login)
+// =========================================================
+window.addEventListener('popstate', function (event) {
+    // 1. Tutup SweetAlert jika sedang terbuka
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+        Swal.close();
+    }
+    
+    // 2. Tutup Modal Login jika sedang terbuka
+    const modalLogin = document.getElementById('modalLogin');
+    if (modalLogin && !modalLogin.classList.contains('hidden')) {
+        tutupModalLogin(true); // Melewati 'true' agar tidak memicu history.back() berulang
+    }
+});
+
+
+// =========================================================
+// FUNGSI BUKA & TUTUP POP-UP LOGIN
+// =========================================================
+function bukaModalLogin() {
+    const modal = document.getElementById('modalLogin');
+    const content = document.getElementById('modalLoginContent');
+    
+    if (modal && content) {
+        modal.classList.remove('hidden'); 
+        
+        // Push state ke history agar tombol Back HP berfungsi menutup modal
+        history.pushState({ modalLoginTerbuka: true }, null, location.href);
+        
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function tutupModalLogin(dariTombolBack = false) {
+    const modal = document.getElementById('modalLogin');
+    const content = document.getElementById('modalLoginContent');
+    
+    if (modal && content) {
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); 
+
+        // Bersihkan state jika ditutup manual (lewat tombol X)
+        if (!dariTombolBack && history.state && history.state.modalLoginTerbuka) {
+            history.back();
+        }
+    }
+}

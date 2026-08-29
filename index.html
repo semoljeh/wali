@@ -48,59 +48,92 @@
 <!-- ============================================== -->
     <!-- HALAMAN WELCOME SCREEN (PORTAL ORTU) -->
     <!-- ============================================== -->
-   <div id="welcomeOrtu" class="hidden fixed inset-0 z-[200] bg-gradient-to-br from-emerald-800 to-teal-900 flex flex-col items-center justify-center p-6 transition-opacity duration-700">
+    <div id="welcomeOrtu" class="fixed inset-0 z-[200] bg-gradient-to-br from-emerald-800 to-teal-900 overflow-y-auto transition-opacity duration-700">
         
         <!-- Ornamen Latar Belakang -->
-        <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%221%22 fill-rule=%22nonzero%22%3E%3Cpath d=%22M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L40 1.41V0h-1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+        <div class="fixed inset-0 opacity-10 bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%221%22 fill-rule=%22nonzero%22%3E%3Cpath d=%22M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L40 1.41V0h-1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] pointer-events-none"></div>
      
-
-        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center w-full max-w-sm relative z-10 shadow-2xl">
-            
-            <div class="w-32 h-32 bg-white rounded-full mx-auto flex items-center justify-center p-2 mb-5 shadow-lg border-4 border-emerald-500/50">
-                <img src="asset/logo.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'">
-            </div>
-
-            <h1 class="text-2xl font-heading font-bold text-white mb-1 drop-shadow-md">
-                Ahlan Wa Sahlan
-            </h1>
-            
-            <p class="text-emerald-200 text-[10px] font-bold tracking-widest uppercase mb-6 border-b border-emerald-400/30 pb-4">
-                Bapak/Ibu Wali Santri
-            </p>
-
-            <!-- FORM LOGIN BARU DI DALAM WELCOME SCREEN -->
-            <div class="text-left space-y-4 mb-6">
-                <div>
-                    <label class="block text-xs font-bold text-emerald-100 mb-1">NIS (Nomor Induk Santri)</label>
-                    <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full px-4 py-2.5 rounded-xl bg-white text-gray-800 focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-bold shadow-inner">
-                </div>
-              <div>
-            <label class="block text-xs font-bold text-emerald-100 mb-1">Tanggal Lahir Santri</label>
-            <div class="relative">
-                <!-- Input ini SELALU bertipe date agar kalender langsung muncul di klik pertama -->
-                <input type="date" id="ortuTglLahir" required 
-                       class="peer w-full px-4 py-2.5 rounded-xl bg-white focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-medium shadow-inner"
-                       style="color: transparent;"
-                       onfocus="this.style.color = '#1f2937'"
-                       onblur="if(!this.value) this.style.color = 'transparent'"
-                       onchange="this.style.color = '#1f2937'">
+        <div class="min-h-screen flex flex-col items-center justify-center p-6 relative z-10">
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center w-full max-w-sm shadow-2xl">
                 
-                <!-- Tulisan Placeholder buatan ini menumpuk di atasnya dan akan hilang otomatis saat diklik -->
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 text-sm font-medium pointer-events-none peer-valid:hidden peer-focus:hidden">
-                    dd/mm/yyyy (Pilih Tanggal)
+                <!-- Logo & Judul -->
+                <div class="w-28 h-28 bg-white rounded-full mx-auto flex items-center justify-center p-2 mb-5 shadow-lg border-4 border-emerald-500/50">
+                    <img src="asset/logo.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'">
+                </div>
+
+                <h1 class="text-2xl font-heading font-bold text-white mb-1 drop-shadow-md">Ahlan Wa Sahlan</h1>
+                <p class="text-emerald-200 text-[10px] font-bold tracking-widest uppercase mb-6 border-b border-emerald-400/30 pb-4">Bapak/Ibu Wali Santri</p>
+
+                <!-- Form Login -->
+                <div class="text-left space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-emerald-100 mb-1">NIS (Nomor Induk Santri)</label>
+                        <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full px-4 py-2.5 rounded-xl bg-white text-gray-800 focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-bold shadow-inner">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-emerald-100 mb-1">Tanggal Lahir Santri</label>
+                        <div class="relative">
+                            <input type="date" id="ortuTglLahir" required class="peer w-full px-4 py-2.5 rounded-xl bg-white focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-medium shadow-inner" style="color: transparent;" onfocus="this.style.color = '#1f2937'" onblur="if(!this.value) this.style.color = 'transparent'" onchange="this.style.color = '#1f2937'">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 text-sm font-medium pointer-events-none peer-valid:hidden peer-focus:hidden">dd/mm/yyyy (Pilih Tanggal)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOMBOL MASUK KE PORTAL -->
+                <button id="btnMasukOrtu" onclick="tarikDataDariDatabase()" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-emerald-900 font-bold text-sm py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 mb-4">
+                    <i class="fas fa-sign-in-alt"></i> <span>Masuk ke Portal</span>
+                </button>
+
+                <!-- TOMBOL BUKA PENGUMUMAN (BARU) -->
+                <button onclick="bukaPanelPengumuman()" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-bullhorn text-yellow-300 animate-pulse"></i> <span>Lihat Pengumuman</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- BOTTOM SHEET PENGUMUMAN (MUNCUL DARI BAWAH) -->
+        <!-- ============================================== -->
+        <div id="panelBottomPengumuman" class="fixed inset-x-0 bottom-0 z-[400] transform translate-y-full transition-transform duration-300 ease-in-out flex flex-col items-center">
+            
+            <!-- Latar belakang redup saat panel terbuka -->
+            <div id="backdropPengumuman" class="fixed inset-0 bg-emerald-950/70 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none hidden" onclick="tutupPanelPengumuman()"></div>
+            
+         <!-- Konten Panel (Full Screen) -->
+            <div class="relative z-10 w-full h-[100dvh] sm:h-screen bg-white flex flex-col shadow-2xl">
+                <!-- Handle (Garis penarik di atas) -->
+                <div class="w-full flex justify-center pt-3 pb-1 cursor-pointer" onclick="tutupPanelPengumuman()">
+                    <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+                </div>
+                
+                <div class="flex justify-between items-center px-6 pb-4 pt-2 border-b border-gray-100">
+                    <h5 class="font-bold text-emerald-800 text-lg flex items-center gap-2">
+                        <i class="fas fa-bullhorn text-yellow-500"></i> Informasi Madrasah
+                    </h5>
+                    <button onclick="tutupPanelPengumuman()" class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-500 rounded-full transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <!-- Area Scroll Pengumuman -->
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/50">
+                    <div id="wadahPengumumanPublik" class="space-y-4">
+                        <!-- Konten dirender oleh JS -->
+                    </div>
                 </div>
             </div>
         </div>
-            </div>
 
-           
-         <!-- TOMBOL DIUBAH UNTUK MENJALANKAN FUNGSI TARIK DATA -->
-            <button id="btnMasukOrtu" onclick="tarikDataDariDatabase()" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-emerald-900 font-bold text-sm py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                <i class="fas fa-sign-in-alt"></i> <span>Masuk ke Portal</span>
-            </button>
-            
-        </div>
     </div>
+
+        <!-- ============================================== -->
+        <!-- MODAL POP-UP LOGIN (TETAP ADA SEPERTI SEBELUMNYA) -->
+        <!-- ============================================== -->
+        <div id="modalLogin" class="hidden fixed inset-0 z-[300] bg-emerald-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+           <!-- (Biarkan isi Modal Login Anda yang pakai gambar bg.jpg tetap di sini) -->
+        </div>
+
+    </div> <!-- Penutup Halaman welcomeOrtu -->
 	
     <!-- ============================================== -->
 
