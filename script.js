@@ -869,9 +869,12 @@ window.addEventListener('pagehide', function() {
 });
 
 
+
 // =========================================================
-// FUNGSI ANIMASI BOTTOM SHEET PENGUMUMAN & TOMBOL BACK
+// PENGELOLA PANEL PENGUMUMAN & TOMBOL BACK HP
 // =========================================================
+
+// 1. Membuka panel dan mendaftarkan riwayat semu ke browser
 function bukaPanelPengumuman() {
     const panel = document.getElementById('panelBottomPengumuman');
     const backdrop = document.getElementById('backdropPengumuman');
@@ -879,10 +882,9 @@ function bukaPanelPengumuman() {
     if (panel && backdrop) {
         backdrop.classList.remove('hidden');
         
-        // Memasukkan state ke memori HP agar tombol Back terdeteksi
+        // Mendaftarkan status terbuka ke history agar tombol Back HP mengenalinya
         history.pushState({ panelPengumumanTerbuka: true }, null, location.href);
         
-        // Jeda waktu agar CSS Animation berjalan mulus
         setTimeout(() => {
             backdrop.classList.remove('opacity-0');
             panel.classList.remove('translate-y-full'); 
@@ -890,6 +892,7 @@ function bukaPanelPengumuman() {
     }
 }
 
+// 2. Menutup panel (Mendukung tombol X, klik latar, maupun tombol Back HP)
 function tutupPanelPengumuman(dariTombolBack = false) {
     const panel = document.getElementById('panelBottomPengumuman');
     const backdrop = document.getElementById('backdropPengumuman');
@@ -902,13 +905,34 @@ function tutupPanelPengumuman(dariTombolBack = false) {
             backdrop.classList.add('hidden');
         }, 300);
         
-        // Jika ditutup lewat tombol X, hapus history palsu agar sistem Back HP tetap bersih
+        // Jika ditutup manual lewat tombol X atau klik background, bersihkan history state
         if (!dariTombolBack && history.state && history.state.panelPengumumanTerbuka) {
             history.back(); 
         }
     }
 }
 
+// 3. Sensor Global Tombol Back di HP (Mencegah keluar aplikasi)
+window.addEventListener('popstate', function (event) {
+    // Tutup SweetAlert jika sedang aktif
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+        Swal.close();
+        return;
+    }
+    
+    // Tutup Modal Login jika sedang terbuka
+    const modalLogin = document.getElementById('modalLogin');
+    if (modalLogin && !modalLogin.classList.contains('hidden')) {
+        tutupModalLogin(true); 
+        return;
+    }
+    
+    // Tutup Panel Pengumuman jika sedang terbuka
+    const panelPengumuman = document.getElementById('panelBottomPengumuman');
+    if (panelPengumuman && !panelPengumuman.classList.contains('translate-y-full')) {
+        tutupPanelPengumuman(true); // Nilai true mencegah infinite loop pada history.back()
+    }
+});
 // Event Listener Global untuk menangkap tekanan tombol Back di HP
 window.addEventListener('popstate', function (event) {
     // 1. Tutup peringatan SweetAlert jika kebetulan sedang muncul
@@ -981,7 +1005,7 @@ function muatPengumumanPublik() {
             wadah.innerHTML = ''; 
 
             if (res.status === 'success' && res.data.length > 0) {
-                res.data.forEach(item => {
+res.data.forEach(item => {
                     // Deteksi warna otomatis berdasarkan kata di kategori
                     let badgeClass = "bg-gray-100 text-gray-600 border-gray-200"; // Default
                     let cat = item.kategori ? item.kategori.toUpperCase() : "";
@@ -991,6 +1015,11 @@ function muatPengumumanPublik() {
                     else if (cat.includes("LOMBA")) badgeClass = "bg-orange-100 text-orange-600 border-orange-200";
                     else if (cat.includes("AKADEMIK")) badgeClass = "bg-blue-100 text-blue-600 border-blue-200";
                     else if (cat.includes("KEGIATAN") || cat.includes("HAFLAH")) badgeClass = "bg-emerald-100 text-emerald-600 border-emerald-200";
+
+                    // KODE BARU: Mengamankan tanda petik dan tombol "Enter" agar tidak merusak tombol HTML
+                    const safeJdl = item.judul ? item.judul.replace(/'/g, "\\'") : "";
+                    const safeTgl = item.tanggal ? item.tanggal.replace(/'/g, "\\'") : "";
+                    const safeIsi = item.isi ? item.isi.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") : "";
 
                     wadah.innerHTML += `
                         <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative group mb-3">
@@ -1004,7 +1033,9 @@ function muatPengumumanPublik() {
                                 <h6 class="text-sm font-bold text-emerald-800 mb-1 leading-tight">${item.judul}</h6>
                                <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">${item.isi}</p>
                             </div>
-                            <button onclick="bagikanKeWA('${item.judul}', '${item.tanggal}', '${item.isi}')" 
+                            
+                            <!-- PERBAIKAN: Memanggil variabel safeJdl, safeTgl, dan safeIsi yang sudah diamankan -->
+                            <button onclick="bagikanKeWA('${safeJdl}', '${safeTgl}', '${safeIsi}')" 
                                     class="absolute top-2 right-3 sm:top-1/2 sm:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-[#25D366] border border-gray-200 hover:border-[#25D366] text-gray-400 hover:text-white rounded-full transition-all shadow-sm" 
                                     title="Bagikan ke WhatsApp">
                                 <i class="fab fa-whatsapp"></i>
