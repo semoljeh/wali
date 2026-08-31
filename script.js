@@ -181,14 +181,19 @@ document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
                 }
             }
 
-            // PROSES RENDER DATA
+// PROSES RENDER DATA
             prosesDanTampilkanData(inputNis, santriTerpilih.kelas, responseNilai.headers, responseNilai.data, statusRilis, detailRapor);
             
             // MENUTUP WELCOME SCREEN SETELAH RENDER SELESAI
             tutupWelcomeOrtu();
+
+            // MUNCULKAN BANNER PWA SETELAH SEMUA SELESAI
+            tampilkanPromptPWAOrtu();
         });
         
     })
+	
+	
     .catch(err => {
         showLoading(false);
         Swal.fire('Koneksi Gagal', 'Gagal memuat informasi database dari server cloud.', 'error');
@@ -556,15 +561,19 @@ if ('serviceWorker' in navigator) {
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
-    deferredPromptOrtu = e;
-    if (installPromptOrtu) { 
+    deferredPromptOrtu = e; // Simpan event PWA, tapi jangan tampilkan dulu
+});
+
+// Buat fungsi khusus untuk memanggil banner PWA
+function tampilkanPromptPWAOrtu() {
+    const installPromptOrtu = document.getElementById('pwaInstallPromptOrtu');
+    if (deferredPromptOrtu && installPromptOrtu) { 
         setTimeout(() => { 
-            // Hapus class atas, jalankan animasi turun ke tengah
             installPromptOrtu.classList.remove('-translate-y-[150%]', 'opacity-0'); 
             installPromptOrtu.classList.add('translate-y-0', 'opacity-100'); 
-        }, 1500); 
+        }, 1000); // Banner akan turun 1 detik setelah dipanggil
     }
-});
+}
 
 function tutupNotifPWAOrtu() { 
     if(installPromptOrtu) { 

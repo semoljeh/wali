@@ -87,10 +87,18 @@
 
 <!-- PWA -->
     <div id="pwaInstallPromptOrtu" class="fixed top-4 left-0 right-0 mx-auto z-[100] w-[calc(100%-2rem)] max-w-sm bg-white/90 backdrop-blur-xl border border-emerald-100 shadow-2xl rounded-2xl p-4 transition-all duration-700 transform -translate-y-[150%] opacity-0 flex items-start gap-4">
-        <button onclick="tutupNotifPWAOrtu()" class="absolute top-2 right-2 text-gray-400 w-7 h-7"><i class="fas fa-times"></i></button>
+        <button onclick="tutupNotifPWAOrtu()" class="absolute top-2 right-2 text-gray-400 w-7 h-7 hover:text-red-500 transition-colors"><i class="fas fa-times"></i></button>
+        
+        <!-- Ikon Download (Opsional agar terlihat lebih cantik) -->
+        <div class="w-10 h-10 shrink-0 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+            <i class="fas fa-download"></i>
+        </div>
+
         <div class="flex-1 pt-0.5">
-            <h4 class="font-bold text-gray-800 text-sm mb-1">Install Portal Ortu</h4>
-            <button onclick="installPWAOrtu()" class="w-full py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm">Install Sekarang</button>
+            <h4 class="font-bold text-gray-800 text-sm mb-0.5">Install Portal Ortu</h4>
+            <!-- Tambahan Deskripsi Singkat -->
+            <p class="text-[11px] text-gray-500 leading-relaxed mb-3">Tambahkan aplikasi ke layar utama HP Anda agar akses nilai santri lebih cepat tanpa buka browser.</p>
+            <button onclick="installPWAOrtu()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white text-xs font-bold rounded-lg shadow-sm">Install Sekarang</button>
         </div>
     </div>
 
@@ -127,17 +135,31 @@
             <p class="text-gray-500 text-sm sm:text-base mb-3">NIS: <span id="ortuNisSantri" class="font-mono font-bold">-</span></p>
             <p class="text-emerald-500 text-sm sm:text-base font-semibold mb-4 sm:mb-6">Kelas <span id="ortuKelasSantri">-</span></p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left text-xs sm:text-sm border-t border-gray-100 pt-4 px-2 sm:px-6">
-                <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-50">
-                    <span class="text-gray-400 block mb-1 font-medium"><i class="fas fa-venus-mars mr-1"></i> JK & Orang Tua</span>
-                    <span class="font-semibold text-gray-700 block"><span id="ortuJkSantri">-</span></span>
-                    <span class="font-semibold text-gray-700 block mt-0.5 truncate" id="ortuNamaOrtu">-</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left border-t border-gray-100 pt-5 px-2 sm:px-4 mt-2">
+                <!-- Kotak JK & Orang Tua -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] flex gap-3 items-start">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-venus-mars text-sm"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Identitas & Ortu</span>
+                        <span class="font-bold text-gray-800 text-sm block truncate capitalize" id="ortuJkSantri">-</span>
+                        <span class="font-medium text-gray-500 text-xs block mt-0.5 truncate" id="ortuNamaOrtu">-</span>
+                    </div>
                 </div>
-                <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-50">
-                    <span class="text-gray-400 block mb-1 font-medium"><i class="fas fa-map-marker-alt mr-1"></i> Alamat</span>
-                    <span class="font-semibold text-gray-700 block" id="ortuAlamatSantri">-</span>
+
+                <!-- Kotak Alamat -->
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] flex gap-3 items-start">
+                    <div class="w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-map-marker-alt text-sm"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Alamat Tinggal</span>
+                        <span class="font-bold text-gray-700 text-xs leading-relaxed line-clamp-2" id="ortuAlamatSantri">-</span>
+                    </div>
                 </div>
             </div>
+			
         </div>
 
         <!-- AREA KONTEN (Grid 2 Kolom untuk Desktop) -->
@@ -273,19 +295,31 @@
             </div> <!-- End Grid Desktop -->
         </div> <!-- End Area Konten -->
 
-        <!-- TOMBOL LOG OUT MINT -->
-        <div class="px-5 md:px-12 mt-10 mb-6 relative z-10">
+       <!-- TOMBOL LOG OUT MINT -->
+        <div class="px-5 md:px-12 mt-10 mb-2 relative z-10">
             <button onclick="keluarPortal()" class="w-full bg-[#86efac] hover:bg-[#6ee7b7] text-emerald-900 font-bold tracking-wider text-sm py-4 rounded-[20px] transition-colors shadow-sm cursor-pointer">
                 LOG OUT
             </button>
         </div>
+
+        <!-- FOOTER & LINK WEBSITE -->
+        <div class="text-center pb-8 pt-4 relative z-10">
+            <p class="text-[10px] text-gray-400 font-medium uppercase tracking-widest mb-1">&copy; 2026 Madrasah Darussalam</p>
+            <a href="https://www.madasa.ponpes.id" target="_blank" class="text-xs font-bold text-emerald-600 hover:text-emerald-500 transition-colors flex items-center justify-center gap-1.5">
+                <i class="fas fa-globe"></i> www.madasa.ponpes.id
+            </a>
+        </div>
+        <!-- ==================== -->
+
+    </main>
+	   
+	   
     </main>
     
-    <!-- WIDGET WHATSAPP -->
+<!-- WIDGET WHATSAPP (Diperkecil & Tanpa Denyut) -->
     <div id="wa-widget" class="fixed bottom-6 right-6 z-40 flex flex-col items-center cursor-grab select-none" style="touch-action: none;">
-        <a id="wa-link" href="https://wa.me/6282333166659" target="_blank" class="relative flex items-center justify-center w-12 h-12 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-full shadow-2xl transition-transform transform hover:scale-105 pointer-events-auto">
-            <span class="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-50 animate-ping"></span>
-            <i class="fab fa-whatsapp text-2xl relative z-10"></i>
+        <a id="wa-link" href="https://wa.me/6285182262514" target="_blank" class="relative flex items-center justify-center w-10 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-full shadow-lg transition-transform transform hover:scale-105 pointer-events-auto">
+            <i class="fab fa-whatsapp text-xl relative z-10"></i>
         </a>
     </div>
 	
