@@ -35,36 +35,154 @@
 
 
 <!-- ============================================== -->
-    <!-- HALAMAN WELCOME SCREEN -->
+    <!-- HALAMAN WELCOME SCREEN (MODERN + JAM REALTIME) -->
     <!-- ============================================== -->
-    <div id="welcomeOrtu" class="hidden opacity-0 fixed inset-0 z-[200] bg-gradient-to-br from-emerald-800 to-teal-900 overflow-y-auto transition-opacity duration-700">
-        <div class="fixed inset-0 opacity-10 bg-[url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%221%22 fill-rule=%22nonzero%22%3E%3Cpath d=%22M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L40 1.41V0h-1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] pointer-events-none"></div>
-        <div class="min-h-screen flex flex-col items-center justify-center p-6 relative z-10">
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-3xl text-center w-full max-w-sm shadow-2xl">
-                <div class="w-28 h-28 bg-white rounded-full mx-auto flex items-center justify-center p-2 mb-5 shadow-lg border-4 border-emerald-500/50">
-                    <img src="asset/logo.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'">
-                </div>
-                <h1 class="text-2xl font-bold text-white mb-1 drop-shadow-md">Ahlan Wa Sahlan</h1>
-                <p class="text-emerald-200 text-[10px] font-bold tracking-widest uppercase mb-6 border-b border-emerald-400/30 pb-4">Bapak/Ibu Wali Santri</p>
-                <div class="text-left space-y-4 mb-6">
+    <div id="welcomeOrtu" class="hidden opacity-0 fixed inset-0 z-[200] bg-gray-100/80 backdrop-blur-sm overflow-y-auto transition-opacity duration-700">
+        
+        <!-- Kontainer Utama -->
+        <div class="w-full md:max-w-3xl lg:max-w-4xl mx-auto bg-[#f8fafc] min-h-screen relative flex flex-col shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] sm:border-x border-gray-200 overflow-x-hidden">
+            
+            <!-- HEADER MODERN (Gradasi & Efek Glow) -->
+            <div class="bg-gradient-to-br from-[#064e3b] via-[#0b5141] to-[#0f766e] md:rounded-b-[60px] rounded-b-[40px] px-6 md:px-12 pt-10 md:pt-14 pb-28 relative shadow-2xl z-0 overflow-hidden">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-5 blur-3xl pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 -ml-16 w-48 h-48 rounded-full bg-emerald-400 opacity-10 blur-2xl pointer-events-none"></div>
+
+                <div class="flex justify-between items-start mb-8 md:mb-10 relative z-10">
                     <div>
-                        <label class="block text-xs font-bold text-emerald-100 mb-1">NIS (Nomor Induk Santri)</label>
-                        <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full px-4 py-2.5 rounded-xl bg-white text-gray-800 focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-bold shadow-inner">
+                        <h1 class="text-white text-2xl md:text-3xl font-extrabold tracking-tight drop-shadow-sm">Ahlan Wa Sahlan</h1>
+                        <p class="text-emerald-100/90 text-sm md:text-base mt-1.5 font-medium">Bapak/Ibu Wali Santri</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-emerald-100 mb-1">Tanggal Lahir Santri</label>
-                        <div class="relative">
-                            <input type="date" id="ortuTglLahir" required class="peer w-full px-4 py-2.5 rounded-xl bg-white focus:ring-4 focus:ring-yellow-400/50 outline-none text-sm transition-all font-medium shadow-inner" style="color: transparent;" onfocus="this.style.color = '#1f2937'" onblur="if(!this.value) this.style.color = 'transparent'" onchange="this.style.color = '#1f2937'">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 text-sm font-medium pointer-events-none peer-valid:hidden peer-focus:hidden">dd/mm/yyyy</div>
+                    <button onclick="infoPortalLengkap()" class="text-white mt-1 relative p-3 bg-white/10 hover:bg-white/25 rounded-2xl backdrop-blur-md border border-white/10 transition-all hover:scale-105 cursor-pointer shadow-lg group">
+                        <i class="fas fa-info-circle text-xl group-hover:text-emerald-200 transition-colors"></i>
+                    </button>
+                </div>
+
+                <!-- JAM DIGITAL & TANGGAL -->
+                <div class="flex flex-col justify-center items-center relative z-10 max-w-lg mx-auto bg-white/10 backdrop-blur-md border border-white/20 rounded-[32px] p-6 shadow-2xl">
+                    <div class="flex items-center gap-4 md:gap-8 text-white">
+                        <div class="text-center w-16 md:w-20">
+                            <h3 id="jamPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
+                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Jam</p>
+                        </div>
+                        
+                        <div class="text-3xl md:text-4xl font-bold text-emerald-300 animate-pulse pb-6 drop-shadow-md">:</div>
+                        
+                        <div class="text-center w-16 md:w-20">
+                            <h3 id="menitPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
+                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Menit</p>
+                        </div>
+                        
+                        <div class="text-3xl md:text-4xl font-bold text-emerald-300 animate-pulse pb-6 drop-shadow-md">:</div>
+                        
+                        <div class="text-center w-16 md:w-20">
+                            <h3 id="detikPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
+                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Detik</p>
                         </div>
                     </div>
+                    
+                    <div class="mt-5 pt-4 border-t border-white/20 w-full text-center space-y-1.5">
+                        <p id="teksTanggalMasehi" class="text-[13px] md:text-sm text-white font-bold tracking-wide">Memuat tanggal...</p>
+                        <p id="teksTanggalHijriyah" class="text-xs md:text-[13px] text-emerald-200 font-medium tracking-wide">-</p>
+                    </div>
                 </div>
-                <button id="btnMasukOrtu" onclick="tarikDataDariDatabase()" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-emerald-900 font-bold text-sm py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 mb-4">
-                    <i class="fas fa-sign-in-alt"></i> <span>Masuk ke Portal</span>
-                </button>
-                <button onclick="bukaPanelPengumuman()" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-bullhorn text-yellow-300 animate-pulse"></i> <span>Lihat Pengumuman</span>
-                </button>
+            </div>
+
+<!-- MIDDLE GRID CARDS (Putih Solid) -->
+            <div class="px-5 md:px-10 -mt-12 relative z-10 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 w-full">
+                
+                <!-- Card 1: Akademik -->
+                <div onclick="bukaPanelPengumuman('Akademik')" class="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col items-center text-center transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-10px_rgba(37,99,235,0.15)] cursor-pointer border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-inner">
+                        <i class="fas fa-graduation-cap text-xl"></i>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-gray-800">Akademik</h4>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium">Info Akademik</p>
+                </div>
+
+                <!-- Card 2: Lomba -->
+                <div onclick="bukaPanelPengumuman('Lomba')" class="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col items-center text-center transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-10px_rgba(249,115,22,0.15)] cursor-pointer border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-inner">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-gray-800">Lomba</h4>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium">Info Prestasi</p>
+                </div>
+
+                <!-- Card 3: Libur -->
+                <div onclick="bukaPanelPengumuman('Libur')" class="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col items-center text-center transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-10px_rgba(239,68,68,0.15)] cursor-pointer border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-red-50 to-red-100 text-red-500 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-inner">
+                        <i class="fas fa-calendar-day text-xl"></i>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-gray-800">Libur</h4>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium">Jadwal Libur</p>
+                </div>
+
+                <!-- Card 4: Ujian -->
+                <div onclick="bukaPanelPengumuman('Ujian')" class="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col items-center text-center transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-10px_rgba(168,85,247,0.15)] cursor-pointer border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-inner">
+                        <i class="fas fa-edit text-xl"></i>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-gray-800">Ujian</h4>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium">Jadwal Ujian</p>
+                </div>
+
+                <!-- Card 5: Kegiatan -->
+                <div onclick="bukaPanelPengumuman('Kegiatan')" class="col-span-2 md:col-span-1 bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col items-center text-center transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-10px_rgba(16,185,129,0.15)] cursor-pointer border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110 shadow-inner">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-gray-800">Kegiatan</h4>
+                    <p class="text-[10px] text-gray-400 mt-1 font-medium">Agenda Acara</p>
+                </div>
+
+            </div>
+
+            <!-- TAMPILAN LOGIN -->
+            <div class="mt-8 md:mt-12 px-5 md:px-10 w-full max-w-2xl mx-auto flex flex-col relative z-10">
+                
+                <div class="bg-white rounded-[32px] p-7 md:p-10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.08)] border border-gray-100/50 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-[#064e3b]"></div>
+
+                    <div class="text-center mb-8 mt-3">
+                        <h2 class="text-xl md:text-2xl font-black text-gray-800">Akses Portal</h2>
+                        <p class="text-xs text-gray-500 mt-1.5 font-medium">Masukkan identitas santri untuk melihat laporan</p>
+                    </div>
+
+                    <div class="space-y-5 mb-8 relative z-10">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Nomor Induk Santri</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-emerald-500">
+                                    <i class="fas fa-id-badge text-gray-400 text-lg group-focus-within:text-emerald-500 transition-colors"></i>
+                                </div>
+                                <input type="text" id="ortuNis" placeholder="Contoh: 84260000" class="w-full pl-12 pr-5 py-4 rounded-[20px] bg-gray-50 border-2 border-gray-100 text-gray-800 focus:bg-white focus:ring-0 focus:border-emerald-400 outline-none text-sm transition-all shadow-sm font-bold placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Tanggal Lahir</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                    <i class="fas fa-calendar-alt text-gray-400 text-lg group-focus-within:text-emerald-500 transition-colors"></i>
+                                </div>
+                                <input type="date" id="ortuTglLahir" required class="peer w-full pl-12 pr-5 py-4 rounded-[20px] bg-gray-50 border-2 border-gray-100 focus:bg-white focus:ring-0 focus:border-emerald-400 outline-none text-sm transition-all shadow-sm font-bold text-gray-800" style="color: transparent;" onfocus="this.style.color = '#1f2937'" onblur="if(!this.value) this.style.color = 'transparent'" onchange="this.style.color = '#1f2937'">
+                                <div class="absolute inset-y-0 left-0 pl-12 flex items-center text-gray-400 text-sm font-bold pointer-events-none peer-valid:hidden peer-focus-within:hidden">dd/mm/yyyy</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btnMasukOrtu" onclick="tarikDataDariDatabase()" class="relative z-10 w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#34d399] hover:to-[#10b981] text-white font-bold text-sm tracking-widest uppercase py-4 rounded-[20px] shadow-[0_10px_25px_-8px_rgba(16,185,129,0.5)] transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/20">
+                        <i class="fas fa-sign-in-alt"></i> MASUK PORTAL
+                    </button>
+                </div>
+                
+                <div class="text-center mt-12 mb-8 relative z-10">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">&copy; 2026 Madrasah Darussalam</p>
+                    <a href="https://www.madasa.ponpes.id" target="_blank" class="text-xs font-bold text-emerald-600 hover:text-emerald-500 transition-colors flex items-center justify-center gap-1.5 cursor-pointer hover:underline">
+                        <i class="fas fa-globe"></i> www.madasa.ponpes.id
+                    </a>
+                </div>
+                
             </div>
         </div>
     </div>

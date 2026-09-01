@@ -813,9 +813,38 @@ window.addEventListener('pagehide', function() {
     }
 });
 
-function bukaPanelPengumuman() {
+// =======================================================
+// FUNGSI BUKA PANEL & FILTER PENGUMUMAN
+// =======================================================
+function bukaPanelPengumuman(kategoriPilihan = 'Semua') {
     const panel = document.getElementById('panelBottomPengumuman');
     const backdrop = document.getElementById('backdropPengumuman');
+    
+    // Logika Filter Berdasarkan Kategori
+    const listPengumuman = document.querySelectorAll('.item-pengumuman');
+    listPengumuman.forEach(item => {
+        if (kategoriPilihan === 'Semua') {
+            item.style.display = 'flex'; // Tampilkan semua
+        } else {
+            // Cek atribut data-kategori yang kita sisipkan di HTML
+            if (item.getAttribute('data-kategori') === kategoriPilihan) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none'; // Sembunyikan yang tidak cocok
+            }
+        }
+    });
+
+    // Ubah Judul Panel Secara Dinamis
+    const headerPanel = document.querySelector('.flex.justify-between.items-center.px-6 h5');
+    if (headerPanel) {
+        if (kategoriPilihan === 'Semua') {
+            headerPanel.innerHTML = '<i class="fas fa-bullhorn text-yellow-500"></i> Informasi Madrasah';
+        } else {
+            headerPanel.innerHTML = `<i class="fas fa-filter text-emerald-500"></i> Informasi ${kategoriPilihan}`;
+        }
+    }
+
     if (panel && backdrop) {
         backdrop.classList.remove('hidden');
         history.pushState({ panelPengumumanTerbuka: true }, null, location.href);
@@ -835,6 +864,9 @@ function tutupPanelPengumuman(dariTombolBack = false) {
 
 
 
+// =======================================================
+// FUNGSI MUAT PENGUMUMAN (Ditambahkan Class & Data-Kategori)
+// =======================================================
 function muatPengumumanPublik() {
     const wadah = document.getElementById('wadahPengumumanPublik');
     if (!wadah) return;
@@ -863,8 +895,10 @@ function muatPengumumanPublik() {
                         const safeJdl = item.judul ? item.judul.replace(/'/g, "\\'") : "";
                         const safeTgl = item.tanggal ? item.tanggal.replace(/'/g, "\\'") : "";
                         const safeIsi = item.isi ? item.isi.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") : "";
+                        
+                        // NOTE: Menambahkan class 'item-pengumuman' dan 'data-kategori'
                         wadah.innerHTML += `
-                            <div class="p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative mb-3">
+                            <div class="item-pengumuman p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative mb-3" data-kategori="${kat.id}">
                                 <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
                                     <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${kat.badge}">${item.kategori}</span>
                                     <p class="text-[11px] font-bold text-gray-500"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</p>
@@ -878,8 +912,9 @@ function muatPengumumanPublik() {
                         `;
                     });
                } else {
+                    // NOTE: Menambahkan class 'item-pengumuman' dan 'data-kategori' untuk status kosong
                     wadah.innerHTML += `
-                        <div class="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl flex flex-col sm:flex-row gap-3 relative mb-3">
+                        <div class="item-pengumuman p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl flex flex-col sm:flex-row gap-3 relative mb-3" data-kategori="${kat.id}">
                             <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-200 pb-2.5 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
                                 <span class="inline-block px-2 py-0.5 border text-[9px] font-bold rounded mb-0 sm:mb-2 uppercase tracking-wide ${kat.badge}">${kat.id}</span>
                                 <p class="text-[10px] font-bold text-gray-500"><i class="far fa-clock mr-1"></i> Menunggu Jadwal</p>
@@ -987,3 +1022,139 @@ window.addEventListener('popstate', function (event) {
         return;
     }
 });
+
+// =======================================================
+// FUNGSI INFORMASI TENTANG PORTAL (DESKRIPSI LENGKAP)
+// =======================================================
+function infoPortalLengkap() {
+    Swal.fire({
+        title: '<span class="text-[#0b5141] font-bold text-lg sm:text-xl">Tentang Portal Wali Santri</span>',
+        html: `
+            <div class="text-left text-xs sm:text-sm text-gray-600 space-y-4 mt-2 leading-relaxed">
+                <p><strong>Portal Wali Santri - Madrasah Darussalam</strong> adalah inovasi layanan digital terpadu (Smart Madrasah) yang dirancang khusus untuk menjembatani komunikasi dan transparansi informasi antara madrasah dan Bapak/Ibu wali santri.</p>
+                
+                <div class="bg-emerald-50 p-3 sm:p-4 rounded-xl border border-emerald-200 shadow-sm">
+                    <h6 class="font-bold text-emerald-800 mb-2 border-b border-emerald-200 pb-2 flex items-center text-sm">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i> Fitur Utama Portal
+                    </h6>
+                    <ul class="list-disc pl-5 space-y-1.5 text-gray-700 text-xs sm:text-sm">
+                        <li><strong>Akademik:</strong> Akses nilai ujian tertulis, praktek, membaca, hingga peringkat kelas secara transparan.</li>
+                        <li><strong>Keuangan:</strong> Pengecekan riwayat pembayaran SPP dan rincian sisa tunggakan dengan akurat.</li>
+                        <li><strong>Absensi:</strong> Laporan rekap kehadiran santri (Sakit, Izin, Alpa).</li>
+                        <li><strong>Karakter:</strong> Evaluasi akhlaq, kedisiplinan, dan catatan langsung dari Wali Kelas.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-blue-50 p-3 sm:p-4 rounded-xl border border-blue-200 shadow-sm">
+                    <p class="font-bold text-gray-800 mb-1.5 flex items-center text-sm">
+                        <i class="fas fa-shield-alt text-blue-500 mr-2"></i> Keamanan & Akses 24 Jam
+                    </p>
+                    <p class="text-[11px] sm:text-xs text-gray-700 leading-relaxed">
+                        Sistem ini beroperasi 24 jam penuh. Privasi data santri dijaga ketat dan hanya dapat diakses menggunakan kombinasi sandi <strong>NIS (Nomor Induk Santri)</strong> serta <strong>Tanggal Lahir</strong> yang valid.
+                    </p>
+                </div>
+            </div>
+        `,
+        confirmButtonColor: '#0b5141',
+        confirmButtonText: 'Tutup Informasi',
+        width: '92%',
+        padding: '1.25em',
+        customClass: { 
+            popup: 'rounded-2xl max-w-md', 
+            confirmButton: 'rounded-xl text-sm px-5 py-2.5 font-bold shadow-md' 
+        },
+        // Merekam state ke memori HP saat pop-up terbuka
+        didOpen: () => {
+            history.pushState({ popupTerbuka: true }, null, window.location.href);
+        },
+        // Membersihkan memori jika pop-up ditutup manual (lewat tombol tutup/klik luar)
+        willClose: () => {
+            if (history.state && history.state.popupTerbuka) {
+                window.history.back();
+            }
+        }
+    });
+}
+
+
+// =========================================================
+// PENANGKAP TOMBOL KEMBALI DI HP (POPSTATE EVENT GLOBAL)
+// =========================================================
+window.addEventListener('popstate', function (event) {
+    // 1. Jika peringatan/pop-up (SweetAlert) terbuka, tutup peringatannya saja
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+        Swal.close();
+        return;
+    }
+    
+    // 2. Jika foto besar (Lightbox) terbuka, tutup fotonya tanpa keluar web
+    const modalFoto = document.getElementById('modalFotoBesar');
+    if (modalFoto && !modalFoto.classList.contains('hidden')) {
+        tutupFotoBesar(true);
+        return;
+    }
+
+    // 3. Jika panel pengumuman bawah terbuka, tutup panelnya
+    const panelPengumuman = document.getElementById('panelBottomPengumuman');
+    if (panelPengumuman && !panelPengumuman.classList.contains('translate-y-full')) {
+        tutupPanelPengumuman(true);
+        return;
+    }
+});
+
+
+// =======================================================
+// FUNGSI JAM DIGITAL REAL-TIME & PENANGGALAN LENGKAP
+// =======================================================
+function jalankanJamDigital() {
+    const elJam = document.getElementById('jamPortal');
+    const elMenit = document.getElementById('menitPortal');
+    const elDetik = document.getElementById('detikPortal');
+    const elTeksMasehi = document.getElementById('teksTanggalMasehi');
+    const elTeksHijriyah = document.getElementById('teksTanggalHijriyah');
+
+    if (!elJam || !elMenit || !elDetik) return;
+
+    function perbaruiWaktu() {
+        const waktu = new Date();
+        
+        // 1. Update Jam, Menit, Detik secara terus-menerus
+        elJam.innerText = String(waktu.getHours()).padStart(2, '0');
+        elMenit.innerText = String(waktu.getMinutes()).padStart(2, '0');
+        elDetik.innerText = String(waktu.getSeconds()).padStart(2, '0');
+
+        // 2. Update Tanggal (Masehi + Weton & Hijriyah)
+        if (elTeksMasehi) {
+            const pasaranArr = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+            const selisihHari = Math.floor((waktu.getTime() - (waktu.getTimezoneOffset() * 60000)) / 86400000);
+            const pasaranIndex = (selisihHari + 3) % 5;
+            const weton = pasaranArr[pasaranIndex >= 0 ? pasaranIndex : pasaranIndex + 5];
+            
+            const namaHari = waktu.toLocaleDateString('id-ID', { weekday: 'long' });
+            const tanggalMasehi = waktu.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            const formatMasehiLengkap = `${namaHari} ${weton}, ${tanggalMasehi} M`;
+            
+            if (elTeksMasehi.innerText !== formatMasehiLengkap) {
+                elTeksMasehi.innerText = formatMasehiLengkap;
+                
+                if (elTeksHijriyah) {
+                    try {
+                        const opsiHijriyah = { day: 'numeric', month: 'long', year: 'numeric' };
+                        let strHijriyah = new Intl.DateTimeFormat('id-ID-u-ca-islamic', opsiHijriyah).format(waktu);
+                        strHijriyah = strHijriyah.replace(/\s*(AH|H)\s*$/i, ''); 
+                        elTeksHijriyah.innerText = `${strHijriyah} H.`;
+                    } catch (e) {
+                        elTeksHijriyah.innerText = ''; 
+                    }
+                }
+            }
+        }
+    }
+
+    perbaruiWaktu(); 
+    setInterval(perbaruiWaktu, 1000); 
+}
+
+// Pastikan baris ini ikut ter-copy agar jam otomatis berjalan saat halaman dimuat
+document.addEventListener("DOMContentLoaded", jalankanJamDigital);
