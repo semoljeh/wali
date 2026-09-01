@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Wali Santri - Madrasah Darussalam</title>
     
-    <meta name="description" content="Portal resmi Wali Santri Madrasah Darussalam.">
+    <!-- DESKRIPSI SAAT LINK DIBAGIKAN (SEO & OPEN GRAPH) -->
+    <meta name="description" content="Portal resmi Wali Santri Madrasah Darussalam. Layanan digital terpadu (Smart Madrasah) untuk memantau nilai akademik, keuangan SPP, absensi, dan karakter santri.">
     <meta property="og:title" content="Portal Wali Santri - Madrasah Darussalam">
+    <meta property="og:description" content="Akses informasi santri 24 Jam. Pantau nilai akademik, tagihan keuangan, rekap absensi, dan catatan wali kelas secara mudah dan transparan.">
     <meta property="og:image" content="https://guru.madasa.ponpes.id/asset/logowaliweb.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Smart Madrasah Darussalam">
     
     <link rel="icon" type="image/png" href="asset/logoweb.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -57,34 +61,54 @@
                     </button>
                 </div>
 
-                <!-- JAM DIGITAL & TANGGAL -->
-                <div class="flex flex-col justify-center items-center relative z-10 max-w-lg mx-auto bg-white/10 backdrop-blur-md border border-white/20 rounded-[32px] p-6 shadow-2xl">
-                    <div class="flex items-center gap-4 md:gap-8 text-white">
-                        <div class="text-center w-16 md:w-20">
+<!-- JAM DIGITAL & TANGGAL (ULTRA MODERN GLASSMORPHISM) -->
+                <div class="flex flex-col justify-center items-center relative z-10 w-full max-w-lg mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-[32px] p-7 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden group">
+                    
+                    <!-- Efek kilau (Shine) tipis di pojok kiri atas -->
+                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/20 blur-3xl rounded-full pointer-events-none"></div>
+
+                    <!-- Bagian Jam Digital -->
+                    <div class="flex items-center gap-2 md:gap-4 text-white mb-6 w-full justify-center">
+                        <!-- Kotak Jam -->
+                        <div class="flex flex-col items-center justify-center bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl w-20 md:w-24 py-4 shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]">
                             <h3 id="jamPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
-                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Jam</p>
+                            <p class="text-[9px] md:text-[10px] text-emerald-400 font-bold mt-1.5 tracking-[0.25em] uppercase">Jam</p>
                         </div>
                         
-                        <div class="text-3xl md:text-4xl font-bold text-emerald-300 animate-pulse pb-6 drop-shadow-md">:</div>
+                        <!-- Pemisah -->
+                        <div class="text-2xl md:text-4xl font-black text-emerald-400/80 animate-pulse pb-4 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]">:</div>
                         
-                        <div class="text-center w-16 md:w-20">
+                        <!-- Kotak Menit -->
+                        <div class="flex flex-col items-center justify-center bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl w-20 md:w-24 py-4 shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]">
                             <h3 id="menitPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
-                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Menit</p>
+                            <p class="text-[9px] md:text-[10px] text-emerald-400 font-bold mt-1.5 tracking-[0.25em] uppercase">Menit</p>
                         </div>
                         
-                        <div class="text-3xl md:text-4xl font-bold text-emerald-300 animate-pulse pb-6 drop-shadow-md">:</div>
+                        <!-- Pemisah -->
+                        <div class="text-2xl md:text-4xl font-black text-emerald-400/80 animate-pulse pb-4 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]">:</div>
                         
-                        <div class="text-center w-16 md:w-20">
+                        <!-- Kotak Detik -->
+                        <div class="flex flex-col items-center justify-center bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl w-20 md:w-24 py-4 shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]">
                             <h3 id="detikPortal" class="text-4xl md:text-5xl font-black tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-emerald-200 drop-shadow-sm">00</h3>
-                            <p class="text-[10px] md:text-xs text-emerald-200/90 font-bold mt-2 tracking-[0.2em] uppercase">Detik</p>
+                            <p class="text-[9px] md:text-[10px] text-emerald-400 font-bold mt-1.5 tracking-[0.25em] uppercase">Detik</p>
                         </div>
                     </div>
                     
-                    <div class="mt-5 pt-4 border-t border-white/20 w-full text-center space-y-1.5">
-                        <p id="teksTanggalMasehi" class="text-[13px] md:text-sm text-white font-bold tracking-wide">Memuat tanggal...</p>
-                        <p id="teksTanggalHijriyah" class="text-xs md:text-[13px] text-emerald-200 font-medium tracking-wide">-</p>
+                    <!-- Bagian Tanggal (Desain Pill Badge) -->
+                    <div class="flex flex-col items-center space-y-2.5 w-full pt-1">
+                        <!-- Masehi & Weton -->
+                        <div class="inline-flex items-center justify-center gap-2.5 bg-black/20 border border-white/10 rounded-full px-5 py-2.5 shadow-inner w-full sm:w-auto">
+                            <i class="far fa-calendar-check text-emerald-400 text-sm"></i>
+                            <p id="teksTanggalMasehi" class="text-xs md:text-sm text-white font-semibold tracking-wide">Memuat tanggal...</p>
+                        </div>
+                        <!-- Hijriyah -->
+                        <div class="inline-flex items-center gap-2 px-4 opacity-90">
+                            <i class="fas fa-moon text-emerald-200/80 text-[10px]"></i>
+                            <p id="teksTanggalHijriyah" class="text-[11px] md:text-xs text-emerald-100 font-medium tracking-widest uppercase">-</p>
+                        </div>
                     </div>
                 </div>
+				
             </div>
 
 <!-- MIDDLE GRID CARDS (Putih Solid) -->
@@ -413,10 +437,10 @@
             </div> <!-- End Grid Desktop -->
         </div> <!-- End Area Konten -->
 
-       <!-- TOMBOL LOG OUT MINT -->
+       <!-- TOMBOL LOG OUT -->
         <div class="px-5 md:px-12 mt-10 mb-2 relative z-10">
-            <button onclick="keluarPortal()" class="w-full bg-[#86efac] hover:bg-[#6ee7b7] text-emerald-900 font-bold tracking-wider text-sm py-4 rounded-[20px] transition-colors shadow-sm cursor-pointer">
-                LOG OUT
+            <button onclick="keluarPortal()" class="relative z-10 w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#34d399] hover:to-[#10b981] text-white font-bold text-sm tracking-widest uppercase py-4 rounded-[20px] shadow-[0_10px_25px_-8px_rgba(16,185,129,0.5)] transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/20">
+                <i class="fas fa-sign-out-alt"></i> LOG OUT
             </button>
         </div>
 
@@ -429,13 +453,13 @@
         </div>
         <!-- ==================== -->
 
-    </main>
+
 	   
 	   
     </main>
     
 <!-- WIDGET WHATSAPP (Diperkecil & Tanpa Denyut) -->
-    <div id="wa-widget" class="fixed bottom-6 right-6 z-40 flex flex-col items-center cursor-grab select-none" style="touch-action: none;">
+    <div id="wa-widget" class="hidden opacity-0 fixed bottom-6 right-6 z-40 flex flex-col items-center cursor-grab select-none transition-opacity duration-500" style="touch-action: none;">
         <a id="wa-link" href="https://wa.me/6285182262514" target="_blank" class="relative flex items-center justify-center w-10 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-full shadow-lg transition-transform transform hover:scale-105 pointer-events-auto">
             <i class="fab fa-whatsapp text-xl relative z-10"></i>
         </a>

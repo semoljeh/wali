@@ -115,7 +115,7 @@ function tarikDataDariDatabase() {
             return Swal.fire('Data Tidak Cocok', 'Nomor NIS atau Tanggal Lahir santri yang Anda masukkan salah.', 'error');
         }
 
-document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
+        document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
         document.getElementById('ortuNisSantri').innerText = santriTerpilih.nis;
         document.getElementById('ortuKelasSantri').innerText = santriTerpilih.kelas;
         
@@ -172,7 +172,7 @@ document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
             let statusRilis = 'Sembunyi';
             let detailRapor = {}; 
 
-           if (responsePengaturan.status === 'success') {
+            if (responsePengaturan.status === 'success') {
                 if (responsePengaturan.umum && responsePengaturan.umum.status_rilis) {
                     statusRilis = responsePengaturan.umum.status_rilis;
                 }
@@ -181,19 +181,34 @@ document.getElementById('ortuNamaSantri').innerText = santriTerpilih.nama;
                 }
             }
 
-// PROSES RENDER DATA
+            // ==========================================
+            // BAGIAN YANG SEMPAT HILANG (RENDER UI PROFIL)
+            // ==========================================
             prosesDanTampilkanData(inputNis, santriTerpilih.kelas, responseNilai.headers, responseNilai.data, statusRilis, detailRapor);
-            
-            // MENUTUP WELCOME SCREEN SETELAH RENDER SELESAI
             tutupWelcomeOrtu();
+
+            // MUNCULKAN WIDGET WA SETELAH LOGIN BERHASIL (DENGAN TEKS DINAMIS & RAPI)
+            const widgetWA = document.getElementById('wa-widget');
+            const waLink = document.getElementById('wa-link');
+            
+            if (widgetWA && waLink) {
+                const namaSantri = santriTerpilih.nama.trim();
+                const kelasSantri = santriTerpilih.kelas;
+                
+                const pesanDinamis = `Assalamu'alaikum Admin Madrasah Darussalam,\n\nSaya wali santri dari ananda:\n*Nama:* ${namaSantri}\n*Kelas:* ${kelasSantri}\n\nIngin meminta bantuan terkait layanan Portal Wali Santri.`;
+                
+                waLink.href = `https://api.whatsapp.com/send/?phone=6285182262514&text=${encodeURIComponent(pesanDinamis)}&type=phone_number&app_absent=0`;
+                
+                widgetWA.classList.remove('hidden');
+                setTimeout(() => widgetWA.classList.remove('opacity-0'), 100);
+            }
 
             // MUNCULKAN BANNER PWA SETELAH SEMUA SELESAI
             tampilkanPromptPWAOrtu();
-        });
+            
+        }); // Penutup Promise.all (Nilai & Pengaturan)
         
-    })
-	
-	
+    }) // Penutup Promise.all (Santri & Mapel)
     .catch(err => {
         showLoading(false);
         Swal.fire('Koneksi Gagal', 'Gagal memuat informasi database dari server cloud.', 'error');
@@ -813,6 +828,10 @@ window.addEventListener('pagehide', function() {
     }
 });
 
+
+// Variabel global untuk menyimpan status filter saat ini
+let kategoriPengumumanAktif = 'Semua';
+
 // =======================================================
 // FUNGSI BUKA PANEL & FILTER PENGUMUMAN
 // =======================================================
@@ -820,20 +839,11 @@ function bukaPanelPengumuman(kategoriPilihan = 'Semua') {
     const panel = document.getElementById('panelBottomPengumuman');
     const backdrop = document.getElementById('backdropPengumuman');
     
-    // Logika Filter Berdasarkan Kategori
-    const listPengumuman = document.querySelectorAll('.item-pengumuman');
-    listPengumuman.forEach(item => {
-        if (kategoriPilihan === 'Semua') {
-            item.style.display = 'flex'; // Tampilkan semua
-        } else {
-            // Cek atribut data-kategori yang kita sisipkan di HTML
-            if (item.getAttribute('data-kategori') === kategoriPilihan) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none'; // Sembunyikan yang tidak cocok
-            }
-        }
-    });
+    // Simpan kategori pilihan ke memori
+    kategoriPengumumanAktif = kategoriPilihan;
+    
+    // Terapkan filter pada elemen yang sudah ada
+    terapkanFilterPengumuman();
 
     // Ubah Judul Panel Secara Dinamis
     const headerPanel = document.querySelector('.flex.justify-between.items-center.px-6 h5');
@@ -852,20 +862,47 @@ function bukaPanelPengumuman(kategoriPilihan = 'Semua') {
     }
 }
 
+
+// =======================================================
+// FUNGSI TUTUP PANEL PENGUMUMAN
+// =======================================================
 function tutupPanelPengumuman(dariTombolBack = false) {
     const panel = document.getElementById('panelBottomPengumuman');
     const backdrop = document.getElementById('backdropPengumuman');
+    
     if (panel && backdrop) {
-        backdrop.classList.add('opacity-0'); panel.classList.add('translate-y-full'); 
-        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
-        if (!dariTombolBack && history.state && history.state.panelPengumumanTerbuka) history.back(); 
+        backdrop.classList.add('opacity-0'); 
+        panel.classList.add('translate-y-full'); 
+        
+        setTimeout(() => { 
+            backdrop.classList.add('hidden'); 
+        }, 300);
+        
+        // Membersihkan state history jika ditutup manual lewat tombol silang (X)
+        if (!dariTombolBack && history.state && history.state.panelPengumumanTerbuka) {
+            history.back(); 
+        }
     }
 }
 
-
+// Fungsi pembantu untuk mengeksekusi filter (Bisa dipanggil kapan saja)
+function terapkanFilterPengumuman() {
+    const listPengumuman = document.querySelectorAll('.item-pengumuman');
+    listPengumuman.forEach(item => {
+        if (kategoriPengumumanAktif === 'Semua') {
+            item.style.display = 'flex'; 
+        } else {
+            if (item.getAttribute('data-kategori') === kategoriPengumumanAktif) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none'; 
+            }
+        }
+    });
+}
 
 // =======================================================
-// FUNGSI MUAT PENGUMUMAN (Ditambahkan Class & Data-Kategori)
+// FUNGSI MUAT PENGUMUMAN DARI SERVER
 // =======================================================
 function muatPengumumanPublik() {
     const wadah = document.getElementById('wadahPengumumanPublik');
@@ -896,7 +933,6 @@ function muatPengumumanPublik() {
                         const safeTgl = item.tanggal ? item.tanggal.replace(/'/g, "\\'") : "";
                         const safeIsi = item.isi ? item.isi.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") : "";
                         
-                        // NOTE: Menambahkan class 'item-pengumuman' dan 'data-kategori'
                         wadah.innerHTML += `
                             <div class="item-pengumuman p-4 bg-white border border-gray-200 rounded-xl flex flex-col sm:flex-row gap-3 shadow-sm relative mb-3" data-kategori="${kat.id}">
                                 <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-100 pb-2.5 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
@@ -912,7 +948,6 @@ function muatPengumumanPublik() {
                         `;
                     });
                } else {
-                    // NOTE: Menambahkan class 'item-pengumuman' dan 'data-kategori' untuk status kosong
                     wadah.innerHTML += `
                         <div class="item-pengumuman p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl flex flex-col sm:flex-row gap-3 relative mb-3" data-kategori="${kat.id}">
                             <div class="sm:w-36 shrink-0 border-b sm:border-b-0 sm:border-r border-gray-200 pb-2.5 pr-12 sm:pr-3 flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start">
@@ -927,8 +962,16 @@ function muatPengumumanPublik() {
                     `;
                 }
             });
+            
+            // PENTING: Terapkan ulang filter setelah seluruh elemen selesai di-render
+            terapkanFilterPengumuman();
+
         }).catch(err => { wadah.innerHTML = '<div class="text-center text-xs text-red-400 py-10">Gagal memuat pengumuman.</div>'; });
 }
+
+
+
+
 
 function bagikanKeWA(judul, tanggal, isi) {
     const teksWA = `📢 *${judul}*\n🗓️ ${tanggal}\n\n${isi}\n\n🌐 _Portal Informasi Madrasah Darussalam_`;
