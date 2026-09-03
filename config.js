@@ -1,1 +1,1 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyxobhkyt8rIOsVj11BJDmQPu2_-c-Jp_V3q92aYoDDjX21vIFR2Qeu1GBzjusyItFa7Q/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwUNzEskI-_KP1H3RMcVJPjvzwW40Y8XPGRUSqwdk3Zu6T-QnhWzDcD5nqx_1bdQA-OCA/exec';
