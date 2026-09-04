@@ -159,11 +159,17 @@ function tarikDataDariDatabase() {
         fdPengaturan.append('action', 'getPengaturan');
         fdPengaturan.append('kelas', santriTerpilih.kelas);
 
+        // KODE BARU: Menarik data absen hari ini
+        const fdAbsenHariIni = new URLSearchParams();
+        fdAbsenHariIni.append('action', 'getAbsenHariIni');
+        fdAbsenHariIni.append('kelas', santriTerpilih.kelas);
+
         return Promise.all([
             fetch(GAS_URL, { method: 'POST', body: fdNilai }).then(r => r.json()),
-            fetch(GAS_URL, { method: 'POST', body: fdPengaturan }).then(r => r.json())
+            fetch(GAS_URL, { method: 'POST', body: fdPengaturan }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: fdAbsenHariIni }).then(r => r.json())
         ])
-        .then(([responseNilai, responsePengaturan]) => {
+        .then(([responseNilai, responsePengaturan, responseAbsenHariIni]) => {
             showLoading(false);
             if (responseNilai.status !== 'success') {
                 return Swal.fire('Informasi', 'Data identitas benar, namun nilai kelas belum di-input guru.', 'info');
@@ -178,6 +184,34 @@ function tarikDataDariDatabase() {
                 }
                 if (responsePengaturan.detail) {
                     detailRapor = responsePengaturan.detail; 
+                }
+            }
+
+            // KODE BARU: Proses & Tampilkan Status Kehadiran Hari Ini
+            const elStatusHariIni = document.getElementById('ortuStatusHariIni');
+            if (elStatusHariIni) {
+                let statusHariIni = "Belum Absen"; 
+                if (responseAbsenHariIni.status === 'success' && responseAbsenHariIni.data) {
+                    if (responseAbsenHariIni.data[inputNis]) {
+                        statusHariIni = responseAbsenHariIni.data[inputNis];
+                    }
+                }
+                
+                if (statusHariIni === 'Hadir') {
+                    elStatusHariIni.className = "text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-md bg-emerald-100 text-emerald-700 shadow-sm border border-emerald-200";
+                    elStatusHariIni.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Hadir';
+                } else if (statusHariIni === 'Izin') {
+                    elStatusHariIni.className = "text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-md bg-amber-100 text-amber-700 shadow-sm border border-amber-200";
+                    elStatusHariIni.innerHTML = '<i class="fas fa-envelope-open mr-1"></i> Izin';
+                } else if (statusHariIni === 'Sakit') {
+                    elStatusHariIni.className = "text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-md bg-blue-100 text-blue-700 shadow-sm border border-blue-200";
+                    elStatusHariIni.innerHTML = '<i class="fas fa-briefcase-medical mr-1"></i> Sakit';
+                } else if (statusHariIni === 'Alfa' || statusHariIni === 'Alpa') {
+                    elStatusHariIni.className = "text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-md bg-red-100 text-red-700 shadow-sm border border-red-200";
+                    elStatusHariIni.innerHTML = '<i class="fas fa-times-circle mr-1"></i> Alfa';
+                } else {
+                    elStatusHariIni.className = "text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-md bg-gray-100 text-gray-500 shadow-sm border border-gray-200";
+                    elStatusHariIni.innerHTML = '<i class="fas fa-minus-circle mr-1"></i> Belum Absen';
                 }
             }
 
@@ -206,7 +240,7 @@ function tarikDataDariDatabase() {
             // MUNCULKAN BANNER PWA SETELAH SEMUA SELESAI
             tampilkanPromptPWAOrtu();
             
-        }); // Penutup Promise.all (Nilai & Pengaturan)
+        }); // Penutup Promise.all (Nilai & Pengaturan & Absen)
         
     }) // Penutup Promise.all (Santri & Mapel)
     .catch(err => {
@@ -216,6 +250,9 @@ function tarikDataDariDatabase() {
     });
 }
 
+// =========================================================
+// FUNGSI PROSES & TAMPILKAN DATA (DIPERBARUI UNTUK REKAP ABSEN)
+// =========================================================
 function prosesDanTampilkanData(nis, kelas, headers, rows, statusRilis, detailRapor) {
     const containerHasil = document.getElementById('hasilDataOrtu');
     const tbodyNilai = document.getElementById('bodyTabelNilaiOrtu');
@@ -241,15 +278,18 @@ function prosesDanTampilkanData(nis, kelas, headers, rows, statusRilis, detailRa
     let dataMap = {};
     headers.forEach((h, i) => { dataMap[h.toLowerCase()] = barisSantri[i]; });
 
+    // MENARIK DETAIL RAPOR (YANG SUDAH MENGANDUNG REKAP ABSEN OTOMATIS)
     let detSantri = { akhlaq: '-', kerajinan: '-', disiplin: '-', rapi: '-', sakit: '0', izin: '0', alpa: '0', catatan: '-', keputusan: '-' };
     if (detailRapor && detailRapor[nis]) {
         detSantri = detailRapor[nis];
     }
 
+    // MEMASUKKAN REKAP ABSEN (SAKIT, IZIN, ALPA) KE LAYAR (KOTAK KIRI)
     if(document.getElementById('ortuSakit')) document.getElementById('ortuSakit').innerText = detSantri.sakit || '0';
     if(document.getElementById('ortuIzin')) document.getElementById('ortuIzin').innerText = detSantri.izin || '0';
     if(document.getElementById('ortuAlpa')) document.getElementById('ortuAlpa').innerText = detSantri.alpa || '0';
 
+    // MEMASUKKAN KEPRIBADIAN (AKHLAQ, RAJIN, DISIPLIN, RAPI) KE LAYAR (KOTAK BAWAH)
     let elAkhlaq = document.getElementById('ortuAkhlaq');
     if (elAkhlaq) { 
         elAkhlaq.innerText = (detSantri.akhlaq || '-').toString().toUpperCase();
@@ -262,6 +302,7 @@ function prosesDanTampilkanData(nis, kelas, headers, rows, statusRilis, detailRa
         document.getElementById('ortuCatatan').innerText = teksCatatan;
     }
 
+    // Lanjutkan pengecekan Status Rilis (Sembunyi / Rilis)
     if (statusRilis === 'Sembunyi') {
         if(tbodyNilai) tbodyNilai.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-500"><i class="fas fa-lock text-4xl mb-3 block text-gray-300"></i>Nilai akademik semester ini belum dirilis oleh madrasah.<br><span class="text-xs">Silakan cek kembali secara berkala.</span></td></tr>';
         containerHasil.classList.remove('hidden');

@@ -323,13 +323,19 @@
             <!-- GRID CARDS UNTUK DEKSTOP -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 
-                <!-- ABSENSI (Kiri) -->
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 h-full">
+<!-- ABSENSI (Kiri) -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
                     <h5 class="font-bold text-gray-800 text-sm sm:text-base mb-3"><i class="fas fa-calendar-check text-emerald-500 mr-2"></i> Rekap Absensi</h5>
-                    <div class="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3 text-center mb-3">
                         <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-50"><span class="block text-[10px] sm:text-xs text-blue-600 font-medium mb-1">Sakit</span><span id="ortuSakit" class="text-lg sm:text-xl font-bold text-blue-700">0</span></div>
                         <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-50"><span class="block text-[10px] sm:text-xs text-amber-600 font-medium mb-1">Izin</span><span id="ortuIzin" class="text-lg sm:text-xl font-bold text-amber-700">0</span></div>
                         <div class="bg-red-50/50 p-3 rounded-xl border border-red-50"><span class="block text-[10px] sm:text-xs text-red-600 font-medium mb-1">Alpa</span><span id="ortuAlpa" class="text-lg sm:text-xl font-bold text-red-700">0</span></div>
+                    </div>
+                    
+                    <!-- TAMBAHAN: Laporan Absen Hari Ini -->
+                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <span class="text-[11px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">Kehadiran Hari Ini:</span>
+                        <span id="ortuStatusHariIni" class="text-[11px] sm:text-xs font-bold px-3 py-1 rounded-md bg-gray-100 text-gray-500 shadow-sm"><i class="fas fa-spinner fa-spin mr-1"></i> Cek...</span>
                     </div>
                 </div>
 
