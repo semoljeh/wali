@@ -238,7 +238,7 @@ function tarikDataDariDatabase() {
             }
 
             // MUNCULKAN BANNER PWA SETELAH SEMUA SELESAI
-            tampilkanPromptPWAOrtu();
+           // tampilkanPromptPWAOrtu();
             
         }); // Penutup Promise.all (Nilai & Pengaturan & Absen)
         
@@ -618,6 +618,9 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
     deferredPromptOrtu = e; // Simpan event PWA, tapi jangan tampilkan dulu
+    
+    // TAMBAHKAN BARIS INI: Panggil banner langsung saat halaman siap di-install
+    tampilkanPromptPWAOrtu();
 });
 
 // Buat fungsi khusus untuk memanggil banner PWA
@@ -625,20 +628,20 @@ function tampilkanPromptPWAOrtu() {
     const installPromptOrtu = document.getElementById('pwaInstallPromptOrtu');
     if (deferredPromptOrtu && installPromptOrtu) { 
         setTimeout(() => { 
-            installPromptOrtu.classList.remove('-translate-y-[150%]', 'opacity-0'); 
+            // Hapus tanda minus (-) pada translate-y
+            installPromptOrtu.classList.remove('translate-y-[150%]', 'opacity-0'); 
             installPromptOrtu.classList.add('translate-y-0', 'opacity-100'); 
-        }, 1000); // Banner akan turun 1 detik setelah dipanggil
+        }, 1000); 
     }
 }
 
 function tutupNotifPWAOrtu() { 
     if(installPromptOrtu) { 
-        // Hapus class tengah, kembalikan posisi ke atas
+        // Hapus tanda minus (-) pada translate-y
         installPromptOrtu.classList.remove('translate-y-0', 'opacity-100'); 
-        installPromptOrtu.classList.add('-translate-y-[150%]', 'opacity-0'); 
+        installPromptOrtu.classList.add('translate-y-[150%]', 'opacity-0'); 
     } 
 }
-
 function installPWAOrtu() {
     if (deferredPromptOrtu) {
         deferredPromptOrtu.prompt();
@@ -1082,7 +1085,7 @@ function tutupFotoBesar(dariTombolBack = false) {
 // PENANGKAP TOMBOL KEMBALI DI HP (POPSTATE EVENT GLOBAL)
 // =========================================================
 window.addEventListener('popstate', function (event) {
-    // 1. Jika peringatan/pop-up (SweetAlert) terbuka, tutup peringatannya
+    // 1. Jika peringatan/pop-up (SweetAlert) terbuka, tutup peringatannya saja
     if (typeof Swal !== 'undefined' && Swal.isVisible()) {
         Swal.close();
         return;
@@ -1095,11 +1098,7 @@ window.addEventListener('popstate', function (event) {
         return;
     }
 
-    // 3. Jika modal login (jika ada) terbuka, biarkan
-    const modalLogin = document.getElementById('modalLogin');
-    if (modalLogin && !modalLogin.classList.contains('hidden')) return;
-
-    // 4. Jika panel pengumuman terbuka, tutup panelnya
+    // 3. Jika panel pengumuman bawah terbuka, tutup panelnya
     const panelPengumuman = document.getElementById('panelBottomPengumuman');
     if (panelPengumuman && !panelPengumuman.classList.contains('translate-y-full')) {
         tutupPanelPengumuman(true);
