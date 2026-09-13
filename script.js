@@ -1223,10 +1223,28 @@ function jalankanJamDigital() {
                 
                 if (elTeksHijriyah) {
                     try {
-                        const opsiHijriyah = { day: 'numeric', month: 'long', year: 'numeric' };
-                        let strHijriyah = new Intl.DateTimeFormat('id-ID-u-ca-islamic', opsiHijriyah).format(waktu);
-                        strHijriyah = strHijriyah.replace(/\s*(AH|H)\s*$/i, ''); 
-                        elTeksHijriyah.innerText = `${strHijriyah} H.`;
+                        // Tarik data angka saja (Bulan/Tanggal/Tahun) dari sistem kalender Islam (en-US agar urutannya M/D/YYYY)
+                        const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                        const strWaktu = formatter.format(waktu); 
+                        
+                        // Bersihkan teks sisa (seperti "AH") dan ambil angkanya saja
+                        const bersih = strWaktu.replace(/[^0-9\/]/g, '');
+                        const bagian = bersih.split('/'); 
+                        
+                        if (bagian.length === 3) {
+                            const hBulan = parseInt(bagian[0]) - 1; // Array bulan dimulai dari index 0
+                            const hTanggal = bagian[1];
+                            const hTahun = bagian[2];
+                            
+                            const namaBulanHijriyah = [
+                                "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir", 
+                                "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban", 
+                                "Ramadhan", "Syawal", "Dzulqa'dah", "Dzulhijjah"
+                            ];
+                            
+                            const namaBulanFix = namaBulanHijriyah[hBulan] || ("Bulan " + bagian[0]);
+                            elTeksHijriyah.innerText = `${hTanggal} ${namaBulanFix} ${hTahun} H.`;
+                        }
                     } catch (e) {
                         elTeksHijriyah.innerText = ''; 
                     }
