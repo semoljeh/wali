@@ -43,14 +43,14 @@
     <!-- ============================================== -->
     <div id="welcomeOrtu" class="hidden opacity-0 fixed inset-0 z-[200] bg-gray-100/80 backdrop-blur-sm transition-opacity duration-700">
         
-        <!-- Kontainer Utama (Flexbox Murni: Memastikan Menu Selalu di Bawah Tanpa Terpotong) -->
-        <div class="w-full md:max-w-3xl lg:max-w-4xl mx-auto bg-[#f8fafc] h-[100dvh] flex flex-col shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] sm:border-x border-gray-200 overflow-hidden relative">
+        <!-- Kontainer Utama: Dikunci tinggi penuh (h-full) dengan posisi relative -->
+        <div class="w-full md:max-w-3xl lg:max-w-4xl mx-auto bg-[#f8fafc] h-full relative shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] sm:border-x border-gray-200 overflow-hidden">
             
-            <!-- 1. AREA KONTEN (Fleksibel & Bisa Di-scroll) -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden relative w-full">
+            <!-- 1. AREA KONTEN (Scrollable, dibatasi absolute inset-0 dengan padding bawah agar tidak tertutup menu) -->
+            <div class="absolute inset-0 overflow-y-auto overflow-x-hidden pb-28">
                 
-                <!-- HEADER MODERN (Padding bawah dikurangi jadi pb-12 agar form login naik) -->
-                <div class="bg-gradient-to-br from-[#064e3b] via-[#0b5141] to-[#0f766e] md:rounded-b-[60px] rounded-b-[40px] px-6 md:px-12 pt-10 pb-12 relative shadow-2xl z-0 overflow-hidden">
+                <!-- HEADER MODERN -->
+                <div class="bg-gradient-to-br from-[#064e3b] via-[#0b5141] to-[#0f766e] md:rounded-b-[60px] rounded-b-[40px] px-6 md:px-12 pt-10 pb-16 relative shadow-2xl z-0 overflow-hidden">
                     <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-5 blur-3xl pointer-events-none"></div>
                     <div class="absolute bottom-0 left-0 -ml-16 w-48 h-48 rounded-full bg-emerald-400 opacity-10 blur-2xl pointer-events-none"></div>
 
@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- TAMPILAN LOGIN -->
-                <div class="-mt-8 px-5 md:px-10 w-full max-w-2xl mx-auto flex flex-col relative z-10 pb-10">
+                <div class="-mt-10 px-5 md:px-10 w-full max-w-2xl mx-auto flex flex-col relative z-10">
                     
                     <div class="bg-white rounded-[32px] p-6 md:p-8 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.08)] border border-gray-100/50 relative overflow-hidden">
                         <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-[#064e3b]"></div>
@@ -139,7 +139,7 @@
                         </button>
                     </div>
                     
-                    <div class="text-center mt-8 relative z-10">
+                    <div class="text-center mt-8 mb-4 relative z-10">
                         <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">&copy; 2026 Madrasah Darussalam</p>
                         <a href="https://www.madasa.ponpes.id" target="_blank" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-500 transition-colors flex items-center justify-center gap-1 cursor-pointer hover:underline">
                             <i class="fas fa-globe"></i> www.madasa.ponpes.id
@@ -149,38 +149,38 @@
                 </div>
             </div> <!-- END AREA KONTEN SCROLLABLE -->
 
-            <!-- 2. MODERN BOTTOM NAVIGATION (Flex Item yang selalu nempel di akhir kontainer) -->
-            <div class="w-full relative flex-shrink-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-[250] px-2 sm:px-6 pt-2 pb-3 sm:py-3 flex justify-between items-center rounded-t-[24px] transition-all">
+            <!-- 2. MODERN BOTTOM NAVIGATION (Fixed Absolute di dasar parent container) -->
+            <div class="absolute bottom-0 inset-x-0 h-[70px] sm:h-20 bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-[250] px-2 sm:px-6 flex justify-between items-center rounded-t-[24px]">
                 
-                <button onclick="bukaPanelPengumuman('Akademik')" class="flex flex-col items-center justify-center w-full group focus:outline-none rounded-xl hover:bg-blue-50/50 transition-all p-1">
+                <button onclick="bukaPanelPengumuman('Akademik')" class="flex flex-col items-center justify-center w-full h-full group focus:outline-none rounded-xl hover:bg-blue-50/50 transition-all">
                     <div class="w-9 h-9 mb-1 rounded-[12px] bg-blue-50 text-blue-600 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-active:scale-95 shadow-inner">
                         <i class="fas fa-graduation-cap text-base"></i>
                     </div>
                     <span class="text-[9px] sm:text-[10px] font-bold text-gray-500 group-hover:text-blue-600 transition-colors">Akademik</span>
                 </button>
 
-                <button onclick="bukaPanelPengumuman('Lomba')" class="flex flex-col items-center justify-center w-full group focus:outline-none rounded-xl hover:bg-orange-50/50 transition-all p-1">
+                <button onclick="bukaPanelPengumuman('Lomba')" class="flex flex-col items-center justify-center w-full h-full group focus:outline-none rounded-xl hover:bg-orange-50/50 transition-all">
                     <div class="w-9 h-9 mb-1 rounded-[12px] bg-orange-50 text-orange-500 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-active:scale-95 shadow-inner">
                         <i class="fas fa-trophy text-base"></i>
                     </div>
                     <span class="text-[9px] sm:text-[10px] font-bold text-gray-500 group-hover:text-orange-500 transition-colors">Lomba</span>
                 </button>
 
-                <button onclick="bukaPanelPengumuman('Libur')" class="flex flex-col items-center justify-center w-full group focus:outline-none rounded-xl hover:bg-red-50/50 transition-all p-1">
+                <button onclick="bukaPanelPengumuman('Libur')" class="flex flex-col items-center justify-center w-full h-full group focus:outline-none rounded-xl hover:bg-red-50/50 transition-all">
                     <div class="w-9 h-9 mb-1 rounded-[12px] bg-red-50 text-red-500 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-active:scale-95 shadow-inner">
                         <i class="fas fa-calendar-day text-base"></i>
                     </div>
                     <span class="text-[9px] sm:text-[10px] font-bold text-gray-500 group-hover:text-red-500 transition-colors">Libur</span>
                 </button>
 
-                <button onclick="bukaPanelPengumuman('Ujian')" class="flex flex-col items-center justify-center w-full group focus:outline-none rounded-xl hover:bg-purple-50/50 transition-all p-1">
+                <button onclick="bukaPanelPengumuman('Ujian')" class="flex flex-col items-center justify-center w-full h-full group focus:outline-none rounded-xl hover:bg-purple-50/50 transition-all">
                     <div class="w-9 h-9 mb-1 rounded-[12px] bg-purple-50 text-purple-600 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-active:scale-95 shadow-inner">
                         <i class="fas fa-edit text-base"></i>
                     </div>
                     <span class="text-[9px] sm:text-[10px] font-bold text-gray-500 group-hover:text-purple-600 transition-colors">Ujian</span>
                 </button>
 
-                <button onclick="bukaPanelPengumuman('Kegiatan')" class="flex flex-col items-center justify-center w-full group focus:outline-none rounded-xl hover:bg-emerald-50/50 transition-all p-1">
+                <button onclick="bukaPanelPengumuman('Kegiatan')" class="flex flex-col items-center justify-center w-full h-full group focus:outline-none rounded-xl hover:bg-emerald-50/50 transition-all">
                     <div class="w-9 h-9 mb-1 rounded-[12px] bg-emerald-50 text-emerald-600 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-active:scale-95 shadow-inner">
                         <i class="fas fa-users text-base"></i>
                     </div>
