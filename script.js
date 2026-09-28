@@ -548,23 +548,29 @@ function muatRiwayatSpp(nisSantri) {
     fdSetting.append('action', 'getSettingSpp');
 
     Promise.all([
-        fetch(GAS_URL, { method: 'POST', body: fdSpp }).then(r => r.json()),
-        fetch(GAS_URL, { method: 'POST', body: fdSetting }).then(r => r.json())
+        fetch(GAS_URL, { method: 'POST', body: fdSpp }).then(r => r.json()).catch(() => ({ status: 'error', data: [] })),
+        fetch(GAS_URL, { method: 'POST', body: fdSetting }).then(r => r.json()).catch(() => ({ status: 'error' }))
     ])
     .then(([resSpp, resSetting]) => {
         wadah.innerHTML = ''; 
         
         let totalTagihan = 0;
+        let nominalBulan = 0; 
+        let totalTerbayar = 0;
+        let teksTerbayarRaw = "";
+
         if (resSetting && resSetting.status === 'success') {
-            let nominal = parseFloat(resSetting.nominal) || 0;
+            nominalBulan = parseFloat(resSetting.nominal) || 0;
             let bulan = parseFloat(resSetting.bulan) || 0;
-            totalTagihan = nominal * bulan;
+            totalTagihan = nominalBulan * bulan;
         }
 
-        let totalTerbayar = 0;
-
-        if (resSpp.status === 'success' && resSpp.data.length > 0) {
+        // 1. RENDER YANG LUNAS (HIJAU/NORMAL)
+        if (resSpp.status === 'success' && resSpp.data && resSpp.data.length > 0) {
             resSpp.data.forEach(item => {
+                let keterangan = item.keterangan || "";
+                teksTerbayarRaw += keterangan.toLowerCase() + " "; 
+                
                 let nom = parseFloat(item.nominal) || 0;
                 totalTerbayar += nom;
 
@@ -573,32 +579,70 @@ function muatRiwayatSpp(nisSantri) {
 
                 wadah.innerHTML += `
                     <div class="flex justify-between items-center p-2.5 rounded-lg border text-xs ${warnaBg} mb-2 shadow-sm">
-                        <div>
-                            <span class="font-bold text-gray-700 block mb-0.5">${item.keterangan}</span>
+                        <div class="pr-2">
+                            <span class="font-bold text-gray-700 block mb-0.5 leading-relaxed">${keterangan}</span>
                             <span class="font-semibold text-blue-600">${formatRp(nom)}</span>
                         </div>
-                        <span class="font-bold px-2 py-1 bg-white rounded-md ${warnaTeks} border shadow-sm">${item.status}</span>
+                        <span class="font-bold px-2 py-1 bg-white rounded-md ${warnaTeks} border shadow-sm whitespace-nowrap">${item.status || 'LUNAS'}</span>
                     </div>
                 `;
             });
-        } else {
-            wadah.innerHTML = `<div class="text-center text-xs text-gray-400 py-4 italic">Belum ada riwayat pembayaran yang tercatat.</div>`;
         }
 
+        // 2. KECERDASAN KALENDER HIJRIYAH (HANYA MENAGIH BULAN YANG SUDAH JATUH TEMPO)
+        const waktu = new Date();
+        let hBulanIndex = 0;
+        try {
+            const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic', { month: 'numeric' });
+            const strWaktu = formatter.format(waktu); 
+            hBulanIndex = parseInt(strWaktu.replace(/[^0-9]/g, '')) - 1; 
+        } catch(e) {}
+        
+        const namaBulanHijriyah = ["muharram", "safar", "rabiul awal", "rabiul akhir", "jumadil awal", "jumadil akhir", "rajab", "sya'ban", "ramadhan", "syawal", "dzulqa'dah", "dzulhijjah"];
+        const bulanHijriyahSaatIni = namaBulanHijriyah[hBulanIndex] || "";
+
+        const urutanBulanSyahriah = ["syawal", "dzulqa'dah", "dzulhijjah", "muharram", "safar", "rabiul awal", "rabiul akhir", "jumadil awal", "jumadil akhir", "rajab", "sya'ban"];
+        
+        let targetBulanIndex = urutanBulanSyahriah.indexOf(bulanHijriyahSaatIni);
+        
+        if (targetBulanIndex === -1 && bulanHijriyahSaatIni === "ramadhan") targetBulanIndex = 10;
+        if (targetBulanIndex === -1) targetBulanIndex = 0; 
+        
+        let bulanWajibDibayar = urutanBulanSyahriah.slice(0, targetBulanIndex + 1);
+
+        let daftarNunggak = bulanWajibDibayar.filter(bln => !teksTerbayarRaw.includes(bln));
+
+        if (daftarNunggak.length > 0) {
+            let teksNunggak = daftarNunggak.map(b => b.replace(/\b\w/g, l => l.toUpperCase())).join(", ");
+            let nominalNunggak = nominalBulan * daftarNunggak.length;
+            
+            wadah.innerHTML += `
+                <div class="flex justify-between items-center p-2.5 rounded-lg border text-xs bg-red-50 border-red-200 mb-2 shadow-sm">
+                    <div class="pr-2">
+                        <span class="font-bold text-red-700 block mb-0.5 leading-relaxed">${teksNunggak}</span>
+                        <span class="font-semibold text-red-500">${formatRp(nominalNunggak)}</span>
+                    </div>
+                    <span class="font-bold px-2 py-1 bg-white rounded-md text-red-600 border border-red-100 shadow-sm whitespace-nowrap">BELUM BAYAR</span>
+                </div>
+            `;
+        }
+
+        // 3. UPDATE RANGKUMAN (SISA TOTAL 1 TAHUN TANPA BADGE BULAN)
         let sisaTunggakan = Math.max(0, totalTagihan - totalTerbayar);
         
         if (elTagihan) elTagihan.innerText = formatRp(totalTagihan);
         if (elSisa) {
-            if (sisaTunggakan === 0) {
+            if (sisaTunggakan <= 0) {
                 elSisa.innerHTML = '<i class="fas fa-check-circle mr-1"></i> LUNAS';
                 elSisa.className = "text-sm font-black text-emerald-600";
             } else {
+                // Di sini saya mengembalikan kodenya agar hanya merender nominal saja
                 elSisa.innerText = formatRp(sisaTunggakan);
-                elSisa.className = "text-sm font-black text-red-500";
+                elSisa.className = "text-xs sm:text-sm font-black text-red-500";
             }
         }
     }).catch(e => {
-        wadah.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Gagal terhubung ke database.</div>`;
+        wadah.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Sistem gagal merender tagihan SPP.</div>`;
         console.error(e);
     });
 }
