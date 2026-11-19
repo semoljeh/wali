@@ -1013,6 +1013,9 @@ function muatPengumumanPublik() {
             wadah.innerHTML = ''; 
             let dataServer = (res.status === 'success' && res.data) ? res.data : [];
 
+            // JALANKAN BANNER HITUNGAN MUNDUR ACARA TERDEKAT
+            jalankanCountdownPengumuman(dataServer);
+
             kategoriTetap.forEach(kat => {
                 let adaPengumuman = dataServer.filter(item => item.kategori && item.kategori.toUpperCase().includes(kat.id.toUpperCase()));
                 if (adaPengumuman.length > 0) {
@@ -1303,3 +1306,312 @@ function jalankanJamDigital() {
 
 // Pastikan baris ini ikut ter-copy agar jam otomatis berjalan saat halaman dimuat
 document.addEventListener("DOMContentLoaded", jalankanJamDigital);
+
+// =========================================================
+// FITUR HITUNGAN MUNDUR (COUNTDOWN) MODE SLIDER / GESER
+// =========================================================
+let timerCountdownAcara = null;
+let timerSlideAcara = null;
+
+function parseTanggalIndo(teks) {
+    if (!teks) return null;
+    const str = String(teks).toLowerCase().trim();
+
+    const bulanMap = {
+        'januari': 0, 'jan': 0, 'februari': 1, 'feb': 1, 'pebruari': 1,
+        'maret': 2, 'mar': 2, 'april': 3, 'apr': 3, 'mei': 4,
+        'juni': 5, 'jun': 5, 'juli': 6, 'jul': 6, 'agustus': 7, 'agt': 7, 'agu': 7,
+        'september': 8, 'sep': 8, 'oktober': 9, 'okt': 9,
+        'november': 10, 'nov': 10, 'desember': 11, 'des': 11
+    };
+
+    const matchIndo = str.match(/(\d{1,2})(?:\s*[-–]\s*\d{1,2})?\s+([a-z]+)\s+(\d{4})/);
+    if (matchIndo) {
+        const tgl = parseInt(matchIndo[1], 10);
+        const bln = bulanMap[matchIndo[2]];
+        const thn = parseInt(matchIndo[3], 10);
+        if (bln !== undefined) return new Date(thn, bln, tgl, 0, 0, 0);
+    }
+
+    const matchIso = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (matchIso) {
+        return new Date(parseInt(matchIso[1], 10), parseInt(matchIso[2], 10) - 1, parseInt(matchIso[3], 10), 0, 0, 0);
+    }
+
+    return null;
+}
+
+function jalankanCountdownPengumuman(dataServer) {
+    const wadahWelcome = document.getElementById('countdownWelcome');
+    const wadahDash = document.getElementById('countdownDashboard');
+    if (!wadahWelcome && !wadahDash) return;
+
+    if (timerCountdownAcara) clearInterval(timerCountdownAcara);
+    if (timerSlideAcara) clearInterval(timerSlideAcara);
+
+    const awalHariIni = new Date();
+    awalHariIni.setHours(0, 0, 0, 0);
+
+    const acaraMendatang = (dataServer || [])
+        .map(item => ({ ...item, targetDate: parseTanggalIndo(item.tanggal) }))
+        .filter(item => item.targetDate && item.targetDate >= awalHariIni)
+        .sort((a, b) => a.targetDate - b.targetDate);
+
+    if (acaraMendatang.length === 0) {
+        if (wadahWelcome) wadahWelcome.classList.add('hidden');
+        if (wadahDash) wadahDash.classList.add('hidden');
+        return;
+    }
+
+    const totalSlide = acaraMendatang.length;
+    // Kloning slide pertama di ujung akhir untuk efek infinite loop maju terus
+    const daftarRender = totalSlide > 1 ? [...acaraMendatang, acaraMendatang[0]] : acaraMendatang;
+
+    const slidesHTML = daftarRender.map((acara) => {
+        const kategoriSafe = (acara.kategori || 'Kegiatan').replace(/"/g, '&quot;');
+        const targetMs = acara.targetDate.getTime();
+
+        return `
+            <div class="cd-card w-full shrink-0 snap-center px-0.5 select-none" data-target="${targetMs}" data-kategori="${kategoriSafe}">
+                <div class="cd-inner relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#064e3b] via-[#065f46] to-[#0f766e] p-5 text-white shadow-xl border border-emerald-400/30 cursor-grab active:cursor-grabbing group transition-shadow hover:shadow-2xl">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-amber-400/15 blur-2xl pointer-events-none"></div>
+                    <div class="absolute -left-8 -bottom-8 w-28 h-28 rounded-full bg-emerald-300/10 blur-2xl pointer-events-none"></div>
+
+                    <div class="relative z-10 flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="inline-flex items-center gap-1.5 bg-white/15 border border-white/20 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-amber-300 mb-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-ping"></span>
+                                ${acara.kategori || 'Agenda'} • ${acara.tanggal}
+                            </div>
+                            <h4 class="text-base sm:text-lg font-extrabold leading-snug text-white tracking-tight">${acara.judul}</h4>
+                            <p class="cd-ringkas text-xs text-emerald-100/90 mt-1">Menghitung waktu...</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-amber-300 group-hover:bg-white/20 transition-colors">
+                            <i class="fas fa-hourglass-half text-base"></i>
+                        </div>
+                    </div>
+
+                    <div class="cd-blok-waktu relative z-10 grid grid-cols-4 gap-2 mt-3.5">
+                        <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-xl py-2 text-center">
+                            <span class="cd-hari block text-lg sm:text-2xl font-black font-mono text-white leading-none">00</span>
+                            <span class="block text-[9px] font-bold text-emerald-200 uppercase tracking-wider mt-1">Hari</span>
+                        </div>
+                        <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-xl py-2 text-center">
+                            <span class="cd-jam block text-lg sm:text-2xl font-black font-mono text-white leading-none">00</span>
+                            <span class="block text-[9px] font-bold text-emerald-200 uppercase tracking-wider mt-1">Jam</span>
+                        </div>
+                        <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-xl py-2 text-center">
+                            <span class="cd-menit block text-lg sm:text-2xl font-black font-mono text-white leading-none">00</span>
+                            <span class="block text-[9px] font-bold text-emerald-200 uppercase tracking-wider mt-1">Menit</span>
+                        </div>
+                        <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-xl py-2 text-center">
+                            <span class="cd-detik block text-lg sm:text-2xl font-black font-mono text-amber-300 leading-none">00</span>
+                            <span class="block text-[9px] font-bold text-emerald-200 uppercase tracking-wider mt-1">Detik</span>
+                        </div>
+                    </div>
+
+                    <div class="cd-hari-ini hidden relative z-10 mt-3 bg-white/15 backdrop-blur-md border border-white/20 rounded-2xl py-2.5 px-4 text-center">
+                        <span class="text-xs sm:text-sm font-black tracking-widest uppercase text-amber-300 animate-pulse">
+                            <i class="fas fa-sparkles mr-1"></i> Hari Pelaksanaan Acara
+                        </span>
+                    </div>
+
+                    <div class="cd-detail-btn relative z-10 mt-3 pt-2.5 pb-0.5 border-t border-white/10 flex items-center justify-between text-[10px] text-emerald-200/90 hover:text-white font-semibold cursor-pointer transition-colors">
+    <span><i class="fas fa-bullhorn mr-1 text-amber-300"></i> Klik untuk lihat detail pengumuman</span>
+    <i class="fas fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const dotsHTML = totalSlide > 1
+        ? `<div class="cd-dots flex items-center justify-center gap-1.5 mt-3">
+            ${acaraMendatang.map((_, i) => `
+                <button type="button" data-index="${i}" class="cd-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? 'w-6 bg-emerald-600' : 'w-2 bg-gray-300 hover:bg-emerald-400'}"></button>
+            `).join('')}
+           </div>`
+        : '';
+
+    const sliderHTML = `
+        <div class="relative">
+            <div class="cd-track flex overflow-x-auto snap-x snap-mandatory" style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-x pan-y;">
+                ${slidesHTML}
+            </div>
+            ${dotsHTML}
+        </div>
+    `;
+
+    [wadahWelcome, wadahDash].forEach(w => {
+        if (!w) return;
+        w.innerHTML = sliderHTML;
+        w.classList.remove('hidden');
+
+        const track = w.querySelector('.cd-track');
+        const dots = w.querySelectorAll('.cd-dot');
+        let resetTimeout = null;
+        let resumeTimeout = null;
+
+        // Variabel bantu untuk geser manual (Mouse & Touch) + cegah salah klik
+        let isDown = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+        let hasDragged = false;
+
+       // Hanya teks "Klik untuk lihat detail pengumuman" yang membuka popup
+w.querySelectorAll('.cd-detail-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (hasDragged) return;
+        const card = btn.closest('.cd-card');
+        bukaPanelPengumuman(card?.dataset.kategori || 'Kegiatan');
+    });
+});
+
+        if (totalSlide > 1) {
+            // Klik titik indikator
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+                });
+            });
+
+            // Sinkronkan titik indikator & reset infinite loop secara instan
+            track.addEventListener('scroll', () => {
+                if (track.clientWidth === 0) return;
+                const rawIdx = Math.round(track.scrollLeft / track.clientWidth);
+                const activeIdx = rawIdx % totalSlide;
+
+                dots.forEach((d, i) => {
+                    d.className = `cd-dot h-2 rounded-full transition-all duration-300 ${i === activeIdx ? 'w-6 bg-emerald-600' : 'w-2 bg-gray-300 hover:bg-emerald-400'}`;
+                });
+
+                clearTimeout(resetTimeout);
+                if (rawIdx >= totalSlide) {
+                    resetTimeout = setTimeout(() => {
+                        track.scrollTo({ left: 0, behavior: 'auto' });
+                    }, 350);
+                }
+            });
+
+            // Jeda saat disentuh di HP (Touch)
+            track.addEventListener('touchstart', (e) => {
+                clearTimeout(resumeTimeout);
+                w.dataset.paused = '1';
+                hasDragged = false;
+                startX = e.touches[0].pageX;
+            }, { passive: true });
+
+            track.addEventListener('touchmove', (e) => {
+                if (Math.abs(e.touches[0].pageX - startX) > 8) {
+                    hasDragged = true;
+                }
+            }, { passive: true });
+
+            track.addEventListener('touchend', () => {
+                resumeTimeout = setTimeout(() => {
+                    w.dataset.paused = '0';
+                }, 4000);
+            }, { passive: true });
+
+            // Jeda & Geser Manual dengan Mouse di PC/Laptop
+            track.addEventListener('mousedown', (e) => {
+                clearTimeout(resumeTimeout);
+                w.dataset.paused = '1';
+                isDown = true;
+                hasDragged = false;
+                startX = e.pageX;
+                startScrollLeft = track.scrollLeft;
+                track.classList.remove('snap-x', 'snap-mandatory');
+            });
+
+            track.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                const walk = e.pageX - startX;
+                if (Math.abs(walk) > 6) {
+                    hasDragged = true;
+                    e.preventDefault();
+                    track.scrollLeft = startScrollLeft - walk;
+                }
+            });
+
+            const akhiriDragMouse = () => {
+                if (!isDown) return;
+                isDown = false;
+                track.classList.add('snap-x', 'snap-mandatory');
+                // Kunci posisi ke slide terdekat setelah dilepas
+                const targetIdx = Math.round(track.scrollLeft / track.clientWidth);
+                track.scrollTo({ left: targetIdx * track.clientWidth, behavior: 'smooth' });
+                setTimeout(() => { hasDragged = false; }, 100);
+            };
+
+            track.addEventListener('mouseup', akhiriDragMouse);
+            track.addEventListener('mouseleave', () => {
+                akhiriDragMouse();
+                w.dataset.paused = '0';
+            });
+
+            // Jeda saat kursor diarahkan ke banner di PC
+            w.addEventListener('mouseenter', () => {
+                clearTimeout(resumeTimeout);
+                w.dataset.paused = '1';
+            });
+            w.addEventListener('mouseleave', () => {
+                w.dataset.paused = '0';
+            });
+        }
+    });
+
+    // 2. AUTO-SLIDE MAJU TERUS MENERUS TIAP 6 DETIK
+    if (totalSlide > 1) {
+        timerSlideAcara = setInterval(() => {
+            [wadahWelcome, wadahDash].forEach(w => {
+                if (!w || w.dataset.paused === '1') return;
+                const track = w.querySelector('.cd-track');
+                if (!track || track.clientWidth === 0) return;
+
+                const currentIdx = Math.round(track.scrollLeft / track.clientWidth);
+                track.scrollTo({ left: (currentIdx + 1) * track.clientWidth, behavior: 'smooth' });
+            });
+        }, 6000);
+    }
+
+    // 3. UPDATE ANGKA COUNTDOWN TIAP 1 DETIK
+    function updateAngka() {
+        const sekarang = new Date().getTime();
+
+        document.querySelectorAll('.cd-card').forEach(card => {
+            const targetMs = parseInt(card.dataset.target, 10);
+            const selisih = targetMs - sekarang;
+            const isHariIni = selisih <= 0;
+
+            const elRingkas = card.querySelector('.cd-ringkas');
+            const elBlokWaktu = card.querySelector('.cd-blok-waktu');
+            const elHariIni = card.querySelector('.cd-hari-ini');
+
+            if (isHariIni) {
+                if (elRingkas) elRingkas.innerHTML = `<span class="text-amber-300 font-black">Sedang Berlangsung Hari Ini!</span>`;
+                if (elBlokWaktu) elBlokWaktu.classList.add('hidden');
+                if (elHariIni) elHariIni.classList.remove('hidden');
+            } else {
+                const hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
+                const jam = Math.floor((selisih / (1000 * 60 * 60)) % 24);
+                const menit = Math.floor((selisih / (1000 * 60)) % 60);
+                const detik = Math.floor((selisih / 1000) % 60);
+
+                if (elRingkas) {
+                    elRingkas.innerHTML = hari > 0
+                        ? `Kurang <span class="text-amber-300 font-black text-sm sm:text-base">${hari} Hari Lagi</span> menuju acara`
+                        : `Tinggal <span class="text-amber-300 font-black text-sm sm:text-base">${jam} Jam ${menit} Menit</span> lagi`;
+                }
+                card.querySelector('.cd-hari').textContent = String(hari).padStart(2, '0');
+                card.querySelector('.cd-jam').textContent = String(jam).padStart(2, '0');
+                card.querySelector('.cd-menit').textContent = String(menit).padStart(2, '0');
+                card.querySelector('.cd-detik').textContent = String(detik).padStart(2, '0');
+            }
+        });
+    }
+
+    updateAngka();
+    timerCountdownAcara = setInterval(updateAngka, 1000);
+}
